@@ -1,0 +1,6 @@
+@CrmPridnestrovye_HostAddress = http://localhost:80
+
+GET {{CrmPridnestrovye_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

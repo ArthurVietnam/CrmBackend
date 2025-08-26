@@ -1,0 +1,54 @@
+﻿version: '3.9'
+
+services:
+  crm-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: crm-backend
+    restart: always
+    expose:
+      - "8080"
+    depends_on:
+      postgres:
+        condition: service_healthy 
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - JwtSettings__Secret=apo76AIS8JDhj75fop5sadi3jfhpjPO780IAfposaFf545123
+      - ConnectionStrings__DefaultConnection=Host=crm-db;Port=5432;Database=devdb;Username=postgres;Password=postgres
+    volumes:
+      - data_protection_keys:/app/keys
+    networks:
+      - crm-network
+
+  postgres:
+    image: postgres:16
+    container_name: crm-db 
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: devdb  
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - crm-network
+    healthcheck: 
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7
+    container_name: crm-redis
+    restart: always
+    networks:
+      - crm-network
+
+networks:
+  crm-network:
+
+volumes:
+  postgres_data:
+  data_protection_keys:

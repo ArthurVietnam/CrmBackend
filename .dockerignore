@@ -1,0 +1,7 @@
+﻿in/
+obj/
+.vscode/
+*.md
+*.user
+*.suo
+*.db
