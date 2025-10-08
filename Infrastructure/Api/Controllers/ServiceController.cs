@@ -33,7 +33,7 @@ public class ServiceController : ControllerBase
             var companyId = Guid.Parse(User.FindFirst("companyId").Value);
 
             var result = await _serviceService.CreateAsync(dto,companyId);
-            await _cacheService.RemoveAsync($"services:company:{companyId}");
+            await _cacheService.RemoveAsync($"services:{companyId}:all");
             return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
         }
         catch (Exception ex)
@@ -45,7 +45,7 @@ public class ServiceController : ControllerBase
 
     [AuthorizeByUser]
     [HttpGet("Get/{id}")]
-    public async Task<IActionResult> GetById(Guid id)
+    public async Task<IActionResult> GetById([FromRoute]Guid id)
     {
         try
         {
@@ -76,7 +76,7 @@ public class ServiceController : ControllerBase
             var companyId = Guid.Parse(User.FindFirst("companyId").Value);
             await _serviceService.UpdateAsync(dto,companyId);
             await _cacheService.RemoveAsync($"services:{dto.Id}");
-            await _cacheService.RemoveAsync($"services:company:{companyId}");
+            await _cacheService.RemoveAsync($"services:{companyId}:all");
             return Ok();
         }
         catch (Exception ex)
@@ -88,7 +88,7 @@ public class ServiceController : ControllerBase
 
     [AuthorizeByUser]
     [HttpDelete("Delete/{id}")]
-    public async Task<IActionResult> Delete(Guid id)
+    public async Task<IActionResult> Delete([FromRoute]Guid id)
     {
         try
         {
@@ -159,7 +159,7 @@ public class ServiceController : ControllerBase
         {
             var companyId = Guid.Parse(User.FindFirst("companyId").Value);
 
-            var cacheKey = $"services:company:{companyId}";
+            var cacheKey = $"services:{companyId}:all";
             var cached = await _cacheService.GetAsync<IEnumerable<ServiceReadDto>>(cacheKey);
             if (cached != null)
                 return Ok(cached);

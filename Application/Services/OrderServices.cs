@@ -84,9 +84,9 @@ public class OrderServices
         return _mapper.Map<IReadOnlyList<OrderReadDto>>(orders);
     }
 
-    public async Task UpdateAsync(OrderUpdateDto dto,Guid companyId)
+    public async Task UpdateAsync(OrderUpdateDto dto,Guid companyId,Guid id)
     {
-        var order = await _orderRepository.GetByIdAsync(dto.Id)
+        var order = await _orderRepository.GetByIdAsync(id)
                      ?? throw new NotFoundException("Order not found");
 
         _mapper.Map(dto, order);

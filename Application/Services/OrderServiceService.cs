@@ -60,9 +60,9 @@ public class OrderServiceService
         return _mapper.Map<IReadOnlyList<OrderServiceReadDto>>(entities);
     }
 
-    public async Task UpdateAsync(OrderServiceUpdateDto dto)
+    public async Task UpdateAsync(OrderServiceUpdateDto dto,Guid id)
     {
-        var entity = await _repository.GetByIdAsync(dto.Id) 
+        var entity = await _repository.GetByIdAsync(id) 
                      ?? throw new NotFoundException("Order service not found");
 
         _mapper.Map(dto, entity);

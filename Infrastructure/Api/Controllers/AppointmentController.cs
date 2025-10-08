@@ -24,19 +24,13 @@ public class AppointmentController : ControllerBase
         _cacheService = cacheService;
     }
     
-    [EnableCors("Admin")]
     [Authorize(Roles = "SuperUser")]
     [HttpGet("GetAll")]
     public async Task<IActionResult> GetAll()
     {
         try
         {
-            var cacheKey = "appointments:all";
-            var cached = await _cacheService.GetAsync<IReadOnlyList<AppointmentReadDto>>(cacheKey);
-            if (cached != null) return Ok(cached);
-
             var result = await _appointmentService.GetAllAsync();
-            await _cacheService.SetAsync(cacheKey, result);
             return Ok(result);
         }
         catch (Exception ex)
@@ -48,7 +42,7 @@ public class AppointmentController : ControllerBase
     
     [AuthorizeByUser]
     [HttpGet("Get/{id}")]
-    public async Task<IActionResult> GetById(Guid id)
+    public async Task<IActionResult> GetById([FromRoute] Guid id)
     {
         try
         {
@@ -76,7 +70,7 @@ public class AppointmentController : ControllerBase
             var companyId = Guid.Parse(User.FindFirst("companyId").Value);
 
             var created = await _appointmentService.CreateAsync(dto,companyId);
-            await _cacheService.RemoveAsync("appointments:all");
+            await _cacheService.RemoveAsync($"appointments:{companyId}:all");
             return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
         }
         catch (Exception ex)
@@ -88,32 +82,33 @@ public class AppointmentController : ControllerBase
 
     [AuthorizeByUser]
     [HttpPut("Update/{id}")]
-    public async Task<IActionResult> Update([FromBody] AppointmentUpdateDto dto)
+    public async Task<IActionResult> Update([FromBody] AppointmentUpdateDto dto,[FromRoute] Guid id)
     {
         try
         {
             var companyId = Guid.Parse(User.FindFirst("companyId").Value);
 
-            await _appointmentService.UpdateAsync(dto,companyId);
-            await _cacheService.RemoveAsync("appointments:all");
-            await _cacheService.RemoveAsync($"appointments:{dto.Id}");
+            await _appointmentService.UpdateAsync(dto,companyId,id);
+            await _cacheService.RemoveAsync($"appointments:{companyId}:all");
+            await _cacheService.RemoveAsync($"appointments:{id}");
             return Ok();
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"Error while updating appointment {dto.Id}");
+            _logger.LogError(ex, $"Error while updating appointment {id}");
             return StatusCode(500, ex.Message);
         }
     }
 
     [AuthorizeByUser]
     [HttpDelete("Delete/{id}")]
-    public async Task<IActionResult> Delete(Guid id)
+    public async Task<IActionResult> Delete([FromRoute]Guid id)
     {
         try
         {
+            var companyId = Guid.Parse(User.FindFirst("companyId").Value);
             await _appointmentService.DeleteAsync(id);
-            await _cacheService.RemoveAsync("appointments:all");
+            await _cacheService.RemoveAsync($"appointments:{companyId}:all");
             await _cacheService.RemoveAsync($"appointments:{id}");
             return Ok();
         }
@@ -126,13 +121,14 @@ public class AppointmentController : ControllerBase
 
     [AuthorizeByUser]
     [HttpPut("Complete/{id}")]
-    public async Task<IActionResult> Complete(Guid id)
+    public async Task<IActionResult> Complete([FromRoute]Guid id)
     {
         try
         {
+            var companyId = Guid.Parse(User.FindFirst("companyId").Value);
             await _appointmentService.CompleteAppointmentAsync(id);
             await _cacheService.RemoveAsync($"appointments:{id}");
-            await _cacheService.RemoveAsync("appointments:all");
+            await _cacheService.RemoveAsync($"appointments:{companyId}:all");
             return Ok();
         }
         catch (Exception ex)
@@ -190,7 +186,7 @@ public class AppointmentController : ControllerBase
 
     [AuthorizeByUser]
     [HttpGet("ByClient/{clientId}")]
-    public async Task<IActionResult> GetByClient(Guid clientId)
+    public async Task<IActionResult> GetByClient([FromRoute]Guid clientId)
     {
         try
         {
@@ -206,7 +202,7 @@ public class AppointmentController : ControllerBase
 
     [AuthorizeByUser]
     [HttpGet("ByService/{serviceId}")]
-    public async Task<IActionResult> GetByService(Guid serviceId)
+    public async Task<IActionResult> GetByService([FromRoute]Guid serviceId)
     {
         try
         {
@@ -216,6 +212,33 @@ public class AppointmentController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Error while getting appointments for service {serviceId}");
+            return StatusCode(500, ex.Message);
+        }
+    }
+    
+    [AuthorizeByUser]
+    [HttpGet("GetByCompany")]
+    public async Task<IActionResult> GetByCompany()
+    {
+        try
+        {
+            var companyId = Guid.Parse(User.FindFirst("companyId").Value);
+
+            var cacheKey = $"appointments:{companyId}:all";
+            var cached = await _cacheService.GetAsync<IReadOnlyList<AppointmentReadDto>>(cacheKey);
+            if (cached != null)
+            {
+                return Ok(cached);
+            }
+
+            var appointmentsFromDb = await _appointmentService.GetByCompany(companyId);
+            await _cacheService.SetAsync(cacheKey, appointmentsFromDb);
+
+            return Ok(appointmentsFromDb);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Error while fetching appointments for company");
             return StatusCode(500, ex.Message);
         }
     }

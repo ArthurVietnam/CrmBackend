@@ -44,9 +44,9 @@ public class AppointmentService
         return _mapper.Map<IReadOnlyList<AppointmentReadDto>>(entities);
     }
 
-    public async Task UpdateAsync(AppointmentUpdateDto dto,Guid companyId)
+    public async Task UpdateAsync(AppointmentUpdateDto dto,Guid companyId,Guid id)
     {
-        var entity = await _repository.GetByIdAsync(dto.Id) 
+        var entity = await _repository.GetByIdAsync(id) 
                      ?? throw new NotFoundException("Appointment not found");
         if (entity.CompanyId != companyId)
         {

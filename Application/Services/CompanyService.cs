@@ -23,8 +23,8 @@ public class CompanyService
     public async Task<CompanyReadDto> CreateAsync(CompanyCreateDto dto)
     {
         var entity = _mapper.Map<Company>(dto);
-        await _verificationService.ResendCodeAsync(entity.Id);
         await _repository.AddAsync(entity);
+        await _verificationService.ResendCodeAsync(entity.Id);
         return _mapper.Map<CompanyReadDto>(entity);
     }
 

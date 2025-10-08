@@ -24,22 +24,13 @@ public class OrderServiceController : ControllerBase
         _cacheService = cacheService;
     }
 
-    [EnableCors("Admin")]
     [Authorize(Roles = "SuperUser")]
     [HttpGet("GetAll")]
     public async Task<IActionResult> GetAll()
     {
         try
         {
-            var cached = await _cacheService.GetAsync<IEnumerable<OrderServiceReadDto>>("orderservices:all");
-            if (cached != null)
-            {
-                return Ok(cached);
-            }
-
             var orderServicesFromDb = await _orderServiceService.GetAllAsync();
-            await _cacheService.SetAsync("orderservices:all", orderServicesFromDb);
-
             return Ok(orderServicesFromDb);
         }
         catch (Exception ex)
@@ -51,7 +42,7 @@ public class OrderServiceController : ControllerBase
 
     [AuthorizeByUser]
     [HttpGet("Get/{id}")]
-    public async Task<IActionResult> GetById(Guid id)
+    public async Task<IActionResult> GetById([FromRoute]Guid id)
     {
         try
         {
@@ -82,8 +73,10 @@ public class OrderServiceController : ControllerBase
     {
         try
         {
+            var companyId = Guid.Parse(User.FindFirst("companyId").Value);
+
             var orderService = await _orderServiceService.CreateAsync(request);
-            await _cacheService.RemoveAsync("orderservices:all");
+            await _cacheService.RemoveAsync($"orderservices:{companyId}:all");
             return CreatedAtAction(nameof(GetById), new { id = orderService.Id }, orderService);
         }
         catch (Exception ex)
@@ -95,30 +88,34 @@ public class OrderServiceController : ControllerBase
 
     [AuthorizeByUser]
     [HttpPut("Update/{id}")]
-    public async Task<IActionResult> Update([FromBody] OrderServiceUpdateDto request)
+    public async Task<IActionResult> Update([FromBody] OrderServiceUpdateDto request,[FromRoute] Guid id)
     {
         try
         {
-            await _orderServiceService.UpdateAsync(request);
-            await _cacheService.RemoveAsync("orderservices:all");
-            await _cacheService.RemoveAsync($"orderservices:{request.Id}");
+            var companyId = Guid.Parse(User.FindFirst("companyId").Value);
+
+            await _orderServiceService.UpdateAsync(request,id);
+            await _cacheService.RemoveAsync($"orderservices:{companyId}all");
+            await _cacheService.RemoveAsync($"orderservices:{id}");
             return Ok();
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"Error while updating order service with id {request.Id}");
+            _logger.LogError(ex, $"Error while updating order service with id {id}");
             return StatusCode(500, ex.Message);
         }
     }
 
     [AuthorizeByUser]
     [HttpDelete("Delete/{id}")]
-    public async Task<IActionResult> Delete(Guid id)
+    public async Task<IActionResult> Delete([FromRoute]Guid id)
     {
         try
         {
+            var companyId = Guid.Parse(User.FindFirst("companyId").Value);
+
             await _orderServiceService.DeleteAsync(id);
-            await _cacheService.RemoveAsync("orderservices:all");
+            await _cacheService.RemoveAsync($"orderservices:{companyId}all");
             await _cacheService.RemoveAsync($"orderservices:{id}");
             return Ok();
         }
@@ -131,7 +128,7 @@ public class OrderServiceController : ControllerBase
 
     [AuthorizeByUser]
     [HttpGet("GetByOrder/{orderId}")]
-    public async Task<IActionResult> GetByOrder(Guid orderId)
+    public async Task<IActionResult> GetByOrder([FromRoute]Guid orderId)
     {
         try
         {
@@ -156,7 +153,7 @@ public class OrderServiceController : ControllerBase
 
     [AuthorizeByUser]
     [HttpGet("GetByService/{serviceId}")]
-    public async Task<IActionResult> GetByService(Guid serviceId)
+    public async Task<IActionResult> GetByService([FromRoute]Guid serviceId)
     {
         try
         {
@@ -181,7 +178,7 @@ public class OrderServiceController : ControllerBase
 
     [AuthorizeByUser]
     [HttpGet("CalculateTotal/{orderId}")]
-    public async Task<IActionResult> CalculateOrderTotal(Guid orderId)
+    public async Task<IActionResult> CalculateOrderTotal([FromRoute]Guid orderId)
     {
         try
         {
@@ -197,7 +194,7 @@ public class OrderServiceController : ControllerBase
 
     [AuthorizeByUser]
     [HttpGet("CalculateRevenue/{serviceId}")]
-    public async Task<IActionResult> CalculateTotalRevenue(Guid serviceId)
+    public async Task<IActionResult> CalculateTotalRevenue([FromRoute]Guid serviceId)
     {
         try
         {

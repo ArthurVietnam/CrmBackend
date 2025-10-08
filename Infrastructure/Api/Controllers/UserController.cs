@@ -24,7 +24,7 @@ public class UserController : ControllerBase
         _logger = logger;
         _cacheService = cacheService;
     }
-    
+
     [AuthorizeByCompany]
     [HttpPost("UserCreate")]
     public async Task<IActionResult> UserCreate([FromBody] UserCreateDto dto)
@@ -34,7 +34,7 @@ public class UserController : ControllerBase
             var companyId = Guid.Parse(User.FindFirst("companyId").Value);
             
             var user = await _userService.CreateAsync(dto,companyId);
-            await _cacheService.RemoveAsync($"users:company:{companyId}");
+            await _cacheService.RemoveAsync($"users:{companyId}:all");
             return CreatedAtAction(
                 actionName: nameof(UserController.GetById),
                 controllerName: "User",
@@ -50,7 +50,7 @@ public class UserController : ControllerBase
 
     [AuthorizeByCompany]
     [HttpGet("Get/{id}")]
-    public async Task<IActionResult> GetById(Guid id)
+    public async Task<IActionResult> GetById([FromRoute]Guid id)
     {
         try
         {
@@ -79,7 +79,7 @@ public class UserController : ControllerBase
             var companyId = Guid.Parse(User.FindFirst("companyId").Value);
             await _userService.UpdateAsync(dto, companyId);
             await _cacheService.RemoveAsync($"users:{dto.Id}");
-            await _cacheService.RemoveAsync($"users:company:{companyId}");
+            await _cacheService.RemoveAsync($"users:{companyId}:all");
             return Ok();
         }
         catch (Exception ex)
@@ -98,7 +98,7 @@ public class UserController : ControllerBase
             var companyId = Guid.Parse(User.FindFirst("companyId").Value);
             await _userService.DeleteAsync(id);
             await _cacheService.RemoveAsync($"users:{id}");
-            await _cacheService.RemoveAsync($"users:company:{companyId}");
+            await _cacheService.RemoveAsync($"users:{companyId}:all");
             return Ok();
         }
         catch (Exception ex)
@@ -115,7 +115,7 @@ public class UserController : ControllerBase
         try
         {
             var companyId = Guid.Parse(User.FindFirst("companyId").Value);
-            var cacheKey = $"users:company:{companyId}";
+            var cacheKey = $"users:{companyId}:all";
             var cached = await _cacheService.GetAsync<IReadOnlyList<UserReadDto>>(cacheKey);
             if (cached != null)
                 return Ok(cached);
@@ -133,7 +133,7 @@ public class UserController : ControllerBase
 
     [AuthorizeByUser]
     [HttpPut("UpdatePassword/{userId}")]
-    public async Task<IActionResult> UpdatePassword(Guid userId, [FromQuery] string newPassword)
+    public async Task<IActionResult> UpdatePassword([FromRoute]Guid userId, [FromQuery] string newPassword)
     {
         try
         {

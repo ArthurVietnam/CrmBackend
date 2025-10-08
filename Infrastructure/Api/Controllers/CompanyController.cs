@@ -24,7 +24,6 @@ public class CompanyController : ControllerBase
         _verificationService = verificationService;
     }
     
-    [EnableCors("Admin")]
     [Authorize(Roles = "SuperUser")]
     [HttpGet("GetAll")]
     public async Task<IActionResult> GetAll()
@@ -44,7 +43,7 @@ public class CompanyController : ControllerBase
     [EnableCors("Admin")]
     [Authorize(Roles = "SuperUser")]
     [HttpGet("Get/{id}")]
-    public async Task<IActionResult> GetById(Guid id)
+    public async Task<IActionResult> GetById([FromRoute]Guid id)
     {
         try
         {
@@ -61,7 +60,7 @@ public class CompanyController : ControllerBase
     [EnableCors("Admin")]
     [Authorize(Roles = "SuperUser")]
     [HttpGet("GetByEmail/{email}")]
-    public async Task<IActionResult> GetByEmail(string email)
+    public async Task<IActionResult> GetByEmail([FromRoute]string email)
     {
         try
         {
@@ -184,7 +183,7 @@ public class CompanyController : ControllerBase
     [EnableCors("User")]
     [AuthorizeByCompany]
     [HttpDelete("Deactivate/{companyId}")]
-    public async Task<IActionResult> Deactivate(Guid companyId)
+    public async Task<IActionResult> Deactivate([FromRoute]Guid companyId)
     {
         try
         {
@@ -201,7 +200,7 @@ public class CompanyController : ControllerBase
     [EnableCors("User")]
     [AuthorizeByCompany]
     [HttpDelete("Delete/{id}")]
-    public async Task<IActionResult> Delete(Guid id)
+    public async Task<IActionResult> Delete([FromRoute]Guid id)
     {
         try
         {

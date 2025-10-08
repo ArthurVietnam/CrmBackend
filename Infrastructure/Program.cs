@@ -66,6 +66,11 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNamingPolicy = null; 
+    });
 
 #endregion
 
@@ -136,13 +141,6 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("Html", builder =>
-    {
-        builder.WithOrigins("http://localhost:5000")
-            .AllowAnyMethod()
-            .AllowAnyHeader();
-    });
-    
     options.AddPolicy("Dev", builder =>
     {
         builder.AllowAnyOrigin()

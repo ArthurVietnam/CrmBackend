@@ -25,7 +25,6 @@ public class AuthController : ControllerBase
         _logger = logger;
     }
 
-    [EnableCors("User")]
     [HttpPost("LoginByCompany")]
     public async Task<IActionResult> LoginByCompany([FromBody] AuthRequest request)
     {
@@ -66,7 +65,6 @@ public class AuthController : ControllerBase
         }
     }
     
-    [EnableCors("Dev")]
     [HttpPost("CompanyCreate")]
     public async Task<IActionResult> CompanyCreate([FromBody] CompanyCreateDto request)
     {
@@ -82,7 +80,6 @@ public class AuthController : ControllerBase
         }
     }
     
-    [EnableCors("User")]
     [HttpGet("CompanyRefresh")]
     public async Task<IActionResult> CompanyRefresh([FromQuery] RefreshRequest request)
     {
@@ -101,12 +98,8 @@ public class AuthController : ControllerBase
             
 
             var newAccess = _jwtService.GenerateAccessToken(refreshToken.UserId, company.Email, "Company",refreshToken.UserId);
-            var newRefresh = await _jwtService.GenerateRefreshToken(refreshToken.UserId);
 
-            return Ok(new { AccessToken = newAccess, RefreshToken = newRefresh });
-
-
-
+            return Ok(new { AccessToken = newAccess});
         }
         catch (Exception ex)
         {
@@ -135,10 +128,8 @@ public class AuthController : ControllerBase
             }
             
             var newAccess = _jwtService.GenerateAccessToken(user.Id, user.Email, user.Role.ToString(),companyId);
-            var newRefresh = await _jwtService.GenerateRefreshToken(user.Id);
-            await _jwtService.RemoveRefreshTokenAsync(request.Token);
 
-            return Ok(new { AccessToken = newAccess, RefreshToken = newRefresh });
+            return Ok(new { AccessToken = newAccess});
         }
         catch (Exception ex)
         {

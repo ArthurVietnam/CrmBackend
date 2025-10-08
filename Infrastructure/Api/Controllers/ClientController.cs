@@ -24,22 +24,13 @@ public class ClientController : ControllerBase
         _cacheService = cacheService;
     }
     
-    [EnableCors("Admin")]
     [Authorize(Roles = "SuperUser")]
     [HttpGet("GetAll")]
     public async Task<IActionResult> GetAll()
     {
         try
         {
-            var cached = await _cacheService.GetAsync<IEnumerable<ClientReadDto>>("clients:all");
-            if (cached != null)
-            {
-                return Ok(cached);
-            }
-
             var clientsFromDb = await _clientService.GetAllAsync();
-            await _cacheService.SetAsync("clients:all", clientsFromDb);
-
             return Ok(clientsFromDb);
         }
         catch (Exception ex)
@@ -51,7 +42,7 @@ public class ClientController : ControllerBase
 
     [AuthorizeByUser]
     [HttpGet("Get/{id}")]
-    public async Task<IActionResult> GetById(Guid id)
+    public async Task<IActionResult> GetById([FromRoute] Guid id)
     {
         try
         {
@@ -85,7 +76,7 @@ public class ClientController : ControllerBase
             var companyId = Guid.Parse(User.FindFirst("companyId").Value);
 
             var client = await _clientService.CreateAsync(request,companyId);
-            await _cacheService.RemoveAsync("clients:all");
+            await _cacheService.RemoveAsync($"clients:{companyId}:all");
             return CreatedAtAction(nameof(GetById), new { id = client.Id }, client);
         }
         catch (Exception ex)
@@ -97,32 +88,33 @@ public class ClientController : ControllerBase
 
     [AuthorizeByUser]
     [HttpPut("Update/{id}")]
-    public async Task<IActionResult> Update([FromBody] ClientUpdateDto request)
+    public async Task<IActionResult> Update([FromBody] ClientUpdateDto request, [FromRoute] Guid id)
     {
         try
         {
             var companyId = Guid.Parse(User.FindFirst("companyId").Value);
 
-            await _clientService.UpdateAsync(request,companyId);
-            await _cacheService.RemoveAsync("clients:all");
-            await _cacheService.RemoveAsync($"clients:{request.Id}");
+            await _clientService.UpdateAsync(request,companyId,id);
+            await _cacheService.RemoveAsync($"clients:{companyId}:all");
+            await _cacheService.RemoveAsync($"clients:{id}");
             return Ok();
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"Error while updating client with id {request.Id}");
+            _logger.LogError(ex, $"Error while updating client with id {id}");
             return StatusCode(500, ex.Message);
         }
     }
 
     [AuthorizeByUser]
     [HttpDelete("Delete/{id}")]
-    public async Task<IActionResult> Delete(Guid id)
+    public async Task<IActionResult> Delete([FromRoute] Guid id)
     {
         try
         {
+            var companyId = Guid.Parse(User.FindFirst("companyId").Value);
             await _clientService.DeleteAsync(id);
-            await _cacheService.RemoveAsync("clients:all");
+            await _cacheService.RemoveAsync($"clients:{companyId}:all");
             await _cacheService.RemoveAsync($"clients:{id}");
             return Ok();
         }
@@ -141,15 +133,7 @@ public class ClientController : ControllerBase
         {
             var companyId = Guid.Parse(User.FindFirst("companyId").Value);
 
-            var cacheKey = $"clients:search:{companyId}:{searchTerm.ToLower()}";
-            var cached = await _cacheService.GetAsync<IReadOnlyList<ClientReadDto>>(cacheKey);
-            if (cached != null)
-            {
-                return Ok(cached);
-            }
-
             var resultFromDb = await _clientService.SearchAsync(searchTerm, companyId);
-            await _cacheService.SetAsync(cacheKey, resultFromDb, 5);
 
             return Ok(resultFromDb);
         }
@@ -168,7 +152,7 @@ public class ClientController : ControllerBase
         {
             var companyId = Guid.Parse(User.FindFirst("companyId").Value);
 
-            var cacheKey = $"clients:company:{companyId}";
+            var cacheKey = $"clients:{companyId}:all";
             var cached = await _cacheService.GetAsync<IReadOnlyList<ClientReadDto>>(cacheKey);
             if (cached != null)
             {
