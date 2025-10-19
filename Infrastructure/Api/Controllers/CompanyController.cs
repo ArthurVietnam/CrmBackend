@@ -213,4 +213,38 @@ public class CompanyController : ControllerBase
             return StatusCode(500, ex.Message);
         }
     }
+
+    [AuthorizeByCompany]
+    [HttpGet("GetStatistics")]
+    public async Task<IActionResult> GetStatistics()
+    {
+        try
+        {
+            var companyId = Guid.Parse(User.FindFirst("companyId").Value);
+            var companyStatistics = await _companyService.GetStatistics(companyId);
+            return Ok(companyStatistics);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Error while get statistics company");
+            return StatusCode(500, ex.Message);
+        }
+    }
+    
+    [AuthorizeByCompany]
+    [HttpGet("GetMyCompany")]
+    public async Task<IActionResult> GetMyCompany()
+    {
+        try
+        {
+            var companyId = Guid.Parse(User.FindFirst("companyId").Value);
+            var company = _companyService.GetByIdAsync(companyId);
+            return Ok(company);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Error while get my company");
+            return StatusCode(500, ex.Message);
+        }
+    }
 }

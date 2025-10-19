@@ -10,7 +10,6 @@ namespace CrmPridnestrovye.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[EnableCors("User")]
 
 public class UserController : ControllerBase
 {

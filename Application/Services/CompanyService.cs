@@ -1,9 +1,11 @@
 ﻿using Aplication.Exceptions;
 using Aplication.Interfaces.Repository;
 using AutoMapper;
-using Domain.Entities;
+using DocumentFormat.OpenXml.ExtendedProperties;
 using Shared.Dtos.CompanyDto;
+using Shared.Dtos.Statistics;
 using Shared.Enums;
+using Company = Domain.Entities.Company;
 
 namespace Aplication.Services;
 
@@ -34,7 +36,21 @@ public class CompanyService
                      ?? throw new NotFoundException("Company not found");
         return _mapper.Map<CompanyReadDto>(entity);
     }
-
+    
+    public async Task<StatisticsReadDto> GetStatistics(Guid companyId)
+    {
+        var company = await _repository.GetByIdAsync(companyId)
+                     ?? throw new NotFoundException("Company not found");
+        var statistics = new StatisticsReadDto()
+        {
+            TotalRevenue = company.OrderServices.Sum(os => os.TotalPrice),
+            TotalClients = company.Clients.Count(),
+            TotalOrders = company.Orders.Count(),
+            TotalAppointments = company.Appointments.Count()
+        };
+        return statistics;
+    }
+        
     public async Task<CompanyReadDto> GetByEmailAsync(string email)
     {
         var entity = await _repository.GetByEmailAsync(email)
