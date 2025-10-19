@@ -238,7 +238,7 @@ public class CompanyController : ControllerBase
         try
         {
             var companyId = Guid.Parse(User.FindFirst("companyId").Value);
-            var company = _companyService.GetByIdAsync(companyId);
+            var company = await _companyService.GetByIdAsync(companyId);
             return Ok(company);
         }
         catch (Exception ex)

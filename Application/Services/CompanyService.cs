@@ -2,6 +2,7 @@
 using Aplication.Interfaces.Repository;
 using AutoMapper;
 using DocumentFormat.OpenXml.ExtendedProperties;
+using Domain.Entities;
 using Shared.Dtos.CompanyDto;
 using Shared.Dtos.Statistics;
 using Shared.Enums;
@@ -14,12 +15,18 @@ public class CompanyService
     private readonly ICompanyRepository _repository;
     private readonly IMapper _mapper;
     private readonly VerificationService _verificationService;
+    private readonly IClientRepository _clientRepository;
+    private readonly IAppointmentRepository _appointmentRepository;
+    private readonly IOrderRepository _orderRepository;
 
-    public CompanyService(ICompanyRepository repository, IMapper mapper,VerificationService verificationService)
+    public CompanyService(ICompanyRepository repository, IMapper mapper,VerificationService verificationService, IClientRepository clientRepository, IAppointmentRepository appointmentRepository, IOrderRepository orderRepository)
     {
         _repository = repository;
         _mapper = mapper;
         _verificationService = verificationService;
+        _clientRepository = clientRepository;
+        _appointmentRepository = appointmentRepository;
+        _orderRepository = orderRepository;
     }
 
     public async Task<CompanyReadDto> CreateAsync(CompanyCreateDto dto)
@@ -41,12 +48,18 @@ public class CompanyService
     {
         var company = await _repository.GetByIdAsync(companyId)
                      ?? throw new NotFoundException("Company not found");
-        var statistics = new StatisticsReadDto()
+        var to = (await _orderRepository.GetByCompanyAsync(companyId) ?? new List<Order>()).Count();
+        var tr = (await _orderRepository.GetByCompanyAsync(companyId) ?? new List<Order>()).Sum(o => o.Sum);
+        var tc = (await _clientRepository.GetByCompanyAsync(companyId) ?? new List<Client>()).Count();
+        var ta = (await _appointmentRepository.GetByCompanyAsync(companyId) ?? new List<Appointment>())
+            .Where(a => a.Status == StatusOfWork.Sheduled || a.Status == StatusOfWork.InProgress).Count();
+        
+        var statistics = new StatisticsReadDto
         {
-            TotalRevenue = company.OrderServices.Sum(os => os.TotalPrice),
-            TotalClients = company.Clients.Count(),
-            TotalOrders = company.Orders.Count(),
-            TotalAppointments = company.Appointments.Count()
+            TotalRevenue = tr,
+            TotalClients = tc,
+            TotalOrders = to,
+            TotalAppointments = ta
         };
         return statistics;
     }

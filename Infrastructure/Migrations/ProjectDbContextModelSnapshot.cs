@@ -128,6 +128,9 @@ namespace CrmPridnestrovye.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Email")
+                        .IsUnique();
+
                     b.ToTable("Company");
                 });
 
@@ -311,7 +314,7 @@ namespace CrmPridnestrovye.Migrations
                     b.HasOne("Domain.Entities.Company", "Company")
                         .WithMany("Appointments")
                         .HasForeignKey("CompanyId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Domain.Entities.Service", "Service")
@@ -332,7 +335,7 @@ namespace CrmPridnestrovye.Migrations
                     b.HasOne("Domain.Entities.Company", "Company")
                         .WithMany("Clients")
                         .HasForeignKey("CompanyId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Company");
