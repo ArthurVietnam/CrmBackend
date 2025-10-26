@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Caching.Distributed;
 
 namespace CrmPridnestrovye.Caching;
-
 public class RedisCacheService : ICacheService
 {
     private readonly IDistributedCache _cache;

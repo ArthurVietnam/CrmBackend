@@ -3,6 +3,9 @@ using FluentValidation;
 using Shared.Enums;
 
 namespace Domain.Entities;
+/// <summary>
+/// TODOO сделать ордер вместо сервиса
+/// </summary>
 public class Appointment : BaseEntity
 {
     public DateTime Date { get; private set; }

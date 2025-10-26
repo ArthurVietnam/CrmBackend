@@ -8,7 +8,9 @@ using Shared.Dtos.AppointmentDto;
 using Shared.Enums;
 
 namespace CrmPridnestrovye.Api.Controllers;
-
+/// <summary>
+///  TODOO логи сделать нормалтные
+/// </summary>
 [ApiController]
 [Route("api/[controller]")]
 public class AppointmentController : ControllerBase
