@@ -61,12 +61,11 @@ public class JwtService
             await _refreshTokenRepo.RemoveAsync(existingToken.Token);
         }
 
-        var refreshToken = new RefreshToken
-        {
-            Token = GenerateSecureRefreshToken(),
-            ExpiryDate = DateTime.UtcNow.AddDays(7),
-            UserId = entityId
-        };
+        var refreshToken = new RefreshToken(
+            GenerateSecureRefreshToken(),
+            DateTime.UtcNow.AddDays(7),
+            entityId
+        );
 
         await _refreshTokenRepo.AddAsync(refreshToken);
         return refreshToken.Token;

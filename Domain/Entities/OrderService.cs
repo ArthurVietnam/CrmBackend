@@ -10,7 +10,7 @@ public class OrderService : BaseEntity
     public Guid ServiceId { get; private set; }
     public uint Count { get; private set; }
     public decimal Price { get; private set; }
-    public decimal TotalPrice => Count * Price;
+    public decimal TotalPrice => Count * Price; 
 
     private OrderService() { }
 

@@ -12,7 +12,7 @@ public class Order : BaseEntity
     public Client? Client { get; private set; }
     public Guid? ClientId { get; private set; }
     public Company Company { get; private set; }
-    public Guid CompanyId { get; set; }
+    public Guid CompanyId { get; private set; }
 
     public ICollection<OrderService> OrderServices { get; } = new List<OrderService>();
 
@@ -49,4 +49,9 @@ public class Order : BaseEntity
 
     public void Complete() => Status = StatusOfWork.Done;
     public void Cancel() => Status = StatusOfWork.Canceled;
+    
+    public void UpdateCId(Guid cid)
+    {
+        CompanyId = cid;
+    }
 }

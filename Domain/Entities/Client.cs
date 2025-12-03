@@ -9,7 +9,7 @@ public class Client : BaseEntity
     public string? Email { get; private set; }
     public string? Comment { get; private set; }
     public Company Company { get; private set; }
-    public Guid CompanyId { get; set; }
+    public Guid CompanyId { get; private set; }
 
     public ICollection<Order> Orders { get; } = new List<Order>();
     public ICollection<Appointment> Appointments { get; } = new List<Appointment>();
@@ -46,6 +46,11 @@ public class Client : BaseEntity
         Email = updated.Email;
         Comment = updated.Comment;
         Validate();
+    }
+    
+    public void UpdateCId(Guid cid)
+    {
+        CompanyId = cid;
     }
     
 }

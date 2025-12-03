@@ -3,9 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace CrmPridnestrovye.Dal.EntityFrameworkCore.Configurations;
-/// <summary>
-///  TODOO связи сделатт двусторонние
-/// </summary>
+///  TODO связи сделать двусторонние
 public class AppointmentConfiguration : IEntityTypeConfiguration<Appointment>
 {
     public void Configure(EntityTypeBuilder<Appointment> builder)

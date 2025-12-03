@@ -7,7 +7,7 @@ public class Service : BaseEntity
     public string ServiceName { get; private set; }
     public decimal Price { get; private set; }
     public Company Company { get; private set; }
-    public Guid CompanyId { get;  set; }
+    public Guid CompanyId { get; private set; }
     
     public ICollection<Appointment> Appointments { get; } = new List<Appointment>();
 
@@ -39,5 +39,10 @@ public class Service : BaseEntity
         ServiceName = updated.ServiceName;
         Price = updated.Price;
         Validate();
+    }
+
+    public void UpdateCId(Guid cid)
+    {
+        CompanyId = cid;
     }
 }

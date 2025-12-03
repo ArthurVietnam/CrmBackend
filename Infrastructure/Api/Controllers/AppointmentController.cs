@@ -8,9 +8,7 @@ using Shared.Dtos.AppointmentDto;
 using Shared.Enums;
 
 namespace CrmPridnestrovye.Api.Controllers;
-/// <summary>
-///  TODOO логи сделать нормалтные
-/// </summary>
+///  TODO логи сделать нормалтные
 [ApiController]
 [Route("api/[controller]")]
 public class AppointmentController : ControllerBase
@@ -122,13 +120,13 @@ public class AppointmentController : ControllerBase
     }
 
     [AuthorizeByUser]
-    [HttpPut("Complete/{id}")]
-    public async Task<IActionResult> Complete([FromRoute]Guid id)
+    [HttpPut("UpdateStatus/{id}")]
+    public async Task<IActionResult> UpdateStatus([FromRoute]Guid id,[FromQuery] StatusOfWork status)
     {
         try
         {
             var companyId = Guid.Parse(User.FindFirst("companyId").Value);
-            await _appointmentService.CompleteAppointmentAsync(id);
+            await _appointmentService.UpdateStatusAsync(id, status);
             await _cacheService.RemoveAsync($"appointments:{id}");
             await _cacheService.RemoveAsync($"appointments:{companyId}:all");
             return Ok();

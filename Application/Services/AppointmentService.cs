@@ -21,7 +21,7 @@ public class AppointmentService
     public async Task<AppointmentReadDto> CreateAsync(AppointmentCreateDto dto,Guid companyId)
     {
         var entity = _mapper.Map<Appointment>(dto);
-        entity.CompanyId = companyId;
+        entity.UpdateCId(companyId);
         await _repository.AddAsync(entity);
         return _mapper.Map<AppointmentReadDto>(entity);
     }
@@ -54,7 +54,7 @@ public class AppointmentService
         }
 
         _mapper.Map(dto, entity);
-        entity.CompanyId = companyId;
+        entity.UpdateCId(companyId);
         await _repository.UpdateAsync(entity);
     }
 
@@ -65,11 +65,11 @@ public class AppointmentService
         await _repository.DeleteAsync(entity);
     }
 
-    public async Task CompleteAppointmentAsync(Guid id)
+    public async Task UpdateStatusAsync(Guid id,StatusOfWork status)
     {
         var entity = await _repository.GetByIdAsync(id) 
                      ?? throw new NotFoundException("Appointment not found");
-        entity.Complete();
+        entity.UpdateStatus(status);
         await _repository.UpdateAsync(entity);
     }
 

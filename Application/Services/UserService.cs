@@ -36,7 +36,7 @@ public class UserService
             throw new Exception("Email already registered");
 
         var entity = _mapper.Map<User>(dto);
-        entity.CompanyId = companyId;
+        entity.UpdateCId(companyId);
         await _repository.AddAsync(entity);
         return _mapper.Map<UserReadDto>(entity);
     }
@@ -60,7 +60,7 @@ public class UserService
         }
 
         _mapper.Map(dto, entity);
-        entity.CompanyId = companyId;
+        entity.UpdateCId(companyId);
         await _repository.UpdateAsync(entity);
     }
 

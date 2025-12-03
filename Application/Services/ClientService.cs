@@ -20,7 +20,7 @@ public class ClientService
     public async Task<ClientReadDto> CreateAsync(ClientCreateDto dto,Guid companyId)
     {
         var entity = _mapper.Map<Client>(dto);
-        entity.CompanyId = companyId;
+        entity.UpdateCId(companyId);
         await _repository.AddAsync(entity);
         return _mapper.Map<ClientReadDto>(entity);
     }
@@ -56,7 +56,7 @@ public class ClientService
                      ?? throw new NotFoundException("Client not found");
 
         _mapper.Map(dto, entity);
-        entity.CompanyId = companyId;
+        entity.UpdateCId(companyId);
         await _repository.UpdateAsync(entity);
     }
 

@@ -20,7 +20,7 @@ public class ServiceService
     public async Task<ServiceReadDto> CreateAsync(ServiceCreateDto dto,Guid companyId)
     {
         var entity = _mapper.Map<Service>(dto);
-        entity.CompanyId = companyId;
+        entity.UpdateCId(companyId);
         await _repository.AddAsync(entity);
         return _mapper.Map<ServiceReadDto>(entity);
     }
@@ -38,7 +38,7 @@ public class ServiceService
                      ?? throw new NotFoundException("Service not found");
         
         _mapper.Map(dto, entity);
-        entity.CompanyId = companyId;
+        entity.UpdateCId(companyId);
         await _repository.UpdateAsync(entity);
     }
 

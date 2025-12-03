@@ -3,19 +3,18 @@ using FluentValidation;
 using Shared.Enums;
 
 namespace Domain.Entities;
-/// <summary>
-/// TODOO сделать ордер вместо сервиса
-/// </summary>
+
 public class Appointment : BaseEntity
 {
     public DateTime Date { get; private set; }
+    
     public Guid ClientId { get; private set; }
     public Client Client { get; private set; }
 
     public Guid ServiceId { get; private set; }
     public Service Service { get; private set; }
 
-    public Guid CompanyId { get; set; }
+    public Guid CompanyId { get; private set; }
     public Company Company { get; private set; }
 
     public DateTime DateTime { get; private set; }
@@ -55,6 +54,10 @@ public class Appointment : BaseEntity
         Validate();
     }
 
-    public void Complete() => Status = StatusOfWork.Done;
-    public void Cancel() => Status = StatusOfWork.Canceled;
+    public void UpdateStatus(StatusOfWork status) => Status = status;
+    
+    public void UpdateCId(Guid cid)
+    {
+        CompanyId = cid;
+    }
 }

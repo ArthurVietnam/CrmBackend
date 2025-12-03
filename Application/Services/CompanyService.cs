@@ -48,11 +48,28 @@ public class CompanyService
     {
         var company = await _repository.GetByIdAsync(companyId)
                      ?? throw new NotFoundException("Company not found");
-        var to = (await _orderRepository.GetByCompanyAsync(companyId) ?? new List<Order>()).Count();
-        var tr = (await _orderRepository.GetByCompanyAsync(companyId) ?? new List<Order>()).Sum(o => o.Sum);
-        var tc = (await _clientRepository.GetByCompanyAsync(companyId) ?? new List<Client>()).Count();
-        var ta = (await _appointmentRepository.GetByCompanyAsync(companyId) ?? new List<Appointment>())
-            .Where(a => a.Status == StatusOfWork.Sheduled || a.Status == StatusOfWork.InProgress).Count();
+        
+        var to = (await _orderRepository.GetByCompanyAsync(companyId) ??
+                  new List<Order>()).Count();
+        
+        var tr = (await _orderRepository.GetByCompanyAsync(companyId) ??
+                  new List<Order>())
+                 .Where(o => o.Status == StatusOfWork.Done)
+                 .Sum(o => o.Sum) +
+                 (await _appointmentRepository.GetByCompanyAsync(companyId) ??
+                  new List<Appointment>())
+                 .Where(a => a.Status == StatusOfWork.Done)
+                 .Sum(a => a.Service.Price);
+        
+        var tc = (await _clientRepository.GetByCompanyAsync(companyId) ??
+                  new List<Client>()).Count();
+        
+        var ta = (await _appointmentRepository.GetByCompanyAsync(companyId) ??
+                  new List<Appointment>())
+            .Where(a =>
+                a.Status == StatusOfWork.Sheduled ||
+                a.Status == StatusOfWork.InProgress)
+            .Count();
         
         var statistics = new StatisticsReadDto
         {

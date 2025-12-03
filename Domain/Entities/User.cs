@@ -11,7 +11,7 @@ public class User : BaseEntity
     public string? Phone { get; private set; }
     public string Password { get; set; }
     public Company Company { get; private set; }
-    public Guid CompanyId { get; set; }
+    public Guid CompanyId { get; private set; }
     public UserRole Role { get; private set; }
 
     private User()
@@ -52,4 +52,9 @@ public class User : BaseEntity
 
     public bool IsAdmin() => Role == UserRole.Admin;
     public UserRole UpdateRole(UserRole role) => Role = role;
+    
+    public void UpdateCId(Guid cid)
+    {
+        CompanyId = cid;
+    }
 }

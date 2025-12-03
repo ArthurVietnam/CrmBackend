@@ -170,4 +170,5 @@ public class ClientController : ControllerBase
             return StatusCode(500, ex.Message);
         }
     }
+    /// TODO сделать обновление роли как в аппоинтменте
 }

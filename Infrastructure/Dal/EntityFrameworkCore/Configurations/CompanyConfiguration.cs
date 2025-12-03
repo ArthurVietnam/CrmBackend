@@ -28,35 +28,5 @@ public class CompanyConfiguration : IEntityTypeConfiguration<Company>
         builder.Property(x => x.Password)
             .HasMaxLength(128)
             .IsRequired();
-        
-        builder.HasMany(x => x.Users)
-            .WithOne(x => x.Company)
-            .HasForeignKey(x => x.CompanyId)
-            .OnDelete(DeleteBehavior.Cascade);
-        
-        builder.HasMany(x => x.Orders)
-            .WithOne(x => x.Company)
-            .HasForeignKey(x => x.CompanyId)
-            .OnDelete(DeleteBehavior.Cascade);
-        
-        builder.HasMany(x => x.Appointments)
-            .WithOne(x => x.Company)
-            .HasForeignKey(x => x.CompanyId)
-            .OnDelete(DeleteBehavior.Cascade);
-        
-        builder.HasMany(x => x.Orders)
-            .WithOne(x => x.Company)
-            .HasForeignKey(x => x.CompanyId)
-            .OnDelete(DeleteBehavior.Cascade);
-        
-        builder.HasMany(x => x.Services)
-            .WithOne(x => x.Company)
-            .HasForeignKey(x => x.CompanyId)
-            .OnDelete(DeleteBehavior.Cascade);
-        
-        builder.HasMany(x => x.Clients)
-            .WithOne(x => x.Company)
-            .HasForeignKey(x => x.CompanyId)
-            .OnDelete(DeleteBehavior.Cascade);
     }
 }

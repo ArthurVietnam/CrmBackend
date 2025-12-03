@@ -122,24 +122,8 @@ public class OrderController : ControllerBase
             return StatusCode(500, ex.Message);
         }
     }
-
-    [HttpPost("AddService")]
-    public async Task<IActionResult> AddService([FromBody] OrderServiceCreateDto request)
-    {
-        try
-        {
-            var companyId = Guid.Parse(User.FindFirst("companyId").Value);
-            await _orderServices.AddServiceToOrderAsync(request);
-            await _cacheService.RemoveAsync($"orders:{companyId}:all");
-            return Ok();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error while adding service to order");
-            return StatusCode(500, ex.Message);
-        }
-    }
-
+    
+    /// TODO сделать обновление роли как в аппоинтменте
     [HttpPost("Complete/{id}")]
     public async Task<IActionResult> Complete([FromRoute]Guid id)
     {

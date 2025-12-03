@@ -11,31 +11,22 @@ namespace Aplication.Services;
 public class OrderServices
 {
     private readonly IOrderRepository _orderRepository;
-    private readonly IOrderServiceRepository _orderServiceRepository;
     private readonly IMapper _mapper;
 
     public OrderServices(
         IOrderRepository orderRepository,
-        IOrderServiceRepository orderServiceRepository,
         IMapper mapper)
     {
         _orderRepository = orderRepository;
-        _orderServiceRepository = orderServiceRepository;
         _mapper = mapper;
     }
 
     public async Task<OrderReadDto> CreateOrderAsync(OrderCreateDto dto,Guid companyId)
     {
         var order = _mapper.Map<Order>(dto);
-        order.CompanyId = companyId;
+        order.UpdateCId(companyId);
         await _orderRepository.AddAsync(order);
         return _mapper.Map<OrderReadDto>(order);
-    }
-
-    public async Task AddServiceToOrderAsync(OrderServiceCreateDto dto)
-    {
-        var orderService = _mapper.Map<OrderService>(dto);
-        await _orderServiceRepository.AddAsync(orderService);
     }
 
     public async Task CompleteOrderAsync(Guid orderId)
@@ -90,7 +81,7 @@ public class OrderServices
                      ?? throw new NotFoundException("Order not found");
 
         _mapper.Map(dto, order);
-        order.CompanyId = companyId;
+        order.UpdateCId(companyId);
         await _orderRepository.UpdateAsync(order);
     }
 

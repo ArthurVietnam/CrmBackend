@@ -27,6 +27,7 @@ public class AppointmentRepository : BaseRepository<Appointment>, IAppointmentRe
     {
         return await _dbSet
             .Where(c => c.CompanyId == companyId)
+            .Include(c => c.Service)
             .ToListAsync();
     }
     public async Task<IReadOnlyList<Appointment>> GetByClientAsync(Guid clientId)

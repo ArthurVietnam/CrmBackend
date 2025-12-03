@@ -5,7 +5,7 @@ namespace Domain.Entities;
 public class VerificationCode : BaseEntity
 {
     public Company Company { get; private set; }
-    public Guid CompanyId { get; set; }
+    public Guid CompanyId { get; private set; }
     public string Code { get; private set; }
     public DateTime ExpirationTime { get; private set; }
 
@@ -33,4 +33,9 @@ public class VerificationCode : BaseEntity
     }
 
     public bool IsExpired() => DateTime.UtcNow > ExpirationTime;
+    
+    public void UpdateCId(Guid cid)
+    {
+        CompanyId = cid;
+    }
 }
