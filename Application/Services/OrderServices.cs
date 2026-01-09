@@ -11,13 +11,16 @@ namespace Aplication.Services;
 public class OrderServices
 {
     private readonly IOrderRepository _orderRepository;
+    private readonly OrderServiceService _orderServiceService;
     private readonly IMapper _mapper;
 
     public OrderServices(
         IOrderRepository orderRepository,
+        OrderServiceService orderServiceService,
         IMapper mapper)
     {
         _orderRepository = orderRepository;
+        _orderServiceService = orderServiceService;
         _mapper = mapper;
     }
 
@@ -28,13 +31,18 @@ public class OrderServices
         await _orderRepository.AddAsync(order);
         return _mapper.Map<OrderReadDto>(order);
     }
+    
+    public async Task AddServiceToOrderAsync(OrderServiceCreateDto dto)
+    {
+        await _orderServiceService.CreateAsync(dto);
+    }
 
-    public async Task CompleteOrderAsync(Guid orderId)
+    public async Task UpdateStatusAsync(Guid orderId,StatusOfWork status)
     {
         var order = await _orderRepository.GetByIdAsync(orderId) 
                     ?? throw new NotFoundException("Order not Found");
         
-        order.Complete();
+        order.UpdateStatus(status);
         await _orderRepository.UpdateAsync(order);
     }
 

@@ -123,14 +123,30 @@ public class OrderController : ControllerBase
         }
     }
     
-    /// TODO сделать обновление роли как в аппоинтменте
-    [HttpPost("Complete/{id}")]
-    public async Task<IActionResult> Complete([FromRoute]Guid id)
+    [HttpPost("AddService")]
+    public async Task<IActionResult> AddService([FromBody] OrderServiceCreateDto request)
     {
         try
         {
             var companyId = Guid.Parse(User.FindFirst("companyId").Value);
-            await _orderServices.CompleteOrderAsync(id);
+            await _orderServices.AddServiceToOrderAsync(request);
+            await _cacheService.RemoveAsync($"orders:{companyId}:all");
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error while adding service to order");
+            return StatusCode(500, ex.Message);
+        }
+    }
+    
+    [HttpPut("UpdateStatus/{id}")]
+    public async Task<IActionResult> UpdateStatus([FromRoute]Guid id,[FromQuery] StatusOfWork status)
+    {
+        try
+        {
+            var companyId = Guid.Parse(User.FindFirst("companyId").Value);
+            await _orderServices.UpdateStatusAsync(id,status);
             await _cacheService.RemoveAsync($"orders:{companyId}:all");
             await _cacheService.RemoveAsync($"orders:{id}");
             return Ok();

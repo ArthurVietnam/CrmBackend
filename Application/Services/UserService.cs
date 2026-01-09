@@ -41,6 +41,15 @@ public class UserService
         return _mapper.Map<UserReadDto>(entity);
     }
 
+    public async Task UpdateRoleAsync(Guid userId, UserRole role)
+    {
+        var user = await _repository.GetByIdAsync(userId) ??
+                   throw new NotFoundException("User Not Found");
+        
+        user.UpdateRole(role);
+        await _repository.UpdateAsync(user);
+    }
+
     public async Task<UserReadDto> GetByIdAsync(Guid id)
     {
         var entity = await _repository.GetByIdAsync(id) 

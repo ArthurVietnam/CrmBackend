@@ -9,7 +9,6 @@ public class OrderProfile : Profile
     public OrderProfile()
     {
         CreateMap<OrderCreateDto, Order>()
-            .ForMember(dest => dest.ClientId, opt => opt.Ignore()) 
             .ForMember(dest => dest.Date, opt => opt.MapFrom(_ => DateTime.UtcNow));
 
         CreateMap<Order, OrderReadDto>();

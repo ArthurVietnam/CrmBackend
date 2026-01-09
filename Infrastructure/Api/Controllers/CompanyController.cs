@@ -40,7 +40,6 @@ public class CompanyController : ControllerBase
         }
     }
     
-    [EnableCors("Admin")]
     [Authorize(Roles = "SuperUser")]
     [HttpGet("Get/{id}")]
     public async Task<IActionResult> GetById([FromRoute]Guid id)
@@ -58,7 +57,6 @@ public class CompanyController : ControllerBase
     }
 
     [EnableCors("Admin")]
-    [Authorize(Roles = "SuperUser")]
     [HttpGet("GetByEmail/{email}")]
     public async Task<IActionResult> GetByEmail([FromRoute]string email)
     {
@@ -75,7 +73,6 @@ public class CompanyController : ControllerBase
     }
 
     [EnableCors("Admin")]
-    [Authorize(Roles = "SuperUser")]
     [HttpGet("GetActive")]
     public async Task<IActionResult> GetActiveCompanies()
     {
@@ -92,7 +89,6 @@ public class CompanyController : ControllerBase
     }
 
     [EnableCors("Admin")]
-    [Authorize(Roles = "SuperUser")]
     [HttpGet("GetExpiredSubscriptions")]
     public async Task<IActionResult> GetExpiredSubscriptions()
     {
@@ -109,7 +105,6 @@ public class CompanyController : ControllerBase
     }
     
 
-    [EnableCors("User")]
     [AuthorizeByCompany]
     [HttpPost("ResendCode")]
     public async Task<IActionResult> ResendCode([FromQuery] Guid companyId)
@@ -126,7 +121,6 @@ public class CompanyController : ControllerBase
         }
     }
     
-    [EnableCors("User")]
     [AuthorizeByCompany]
     [HttpPost("ConfirmCode")]
     public async Task<IActionResult> ConfirmCode([FromQuery] Guid companyId,[FromQuery] string code)
@@ -143,7 +137,7 @@ public class CompanyController : ControllerBase
         }
     }
     
-    [EnableCors("User")]
+
     [AuthorizeByCompany]
     [HttpPut("Update")]
     public async Task<IActionResult> Update([FromBody] CompanyUpdateDto request)
@@ -151,7 +145,7 @@ public class CompanyController : ControllerBase
         try
         {
             var companyId = Guid.Parse(User.FindFirst("companyId").Value);
-
+            
             await _companyService.UpdateAsync(request,companyId);
             return Ok();
         }
@@ -163,7 +157,6 @@ public class CompanyController : ControllerBase
     }
 
     [EnableCors("Admin")]
-    [Authorize(Roles = "SuperUser")]
     [HttpPut("ExtendSubscription")]
     public async Task<IActionResult> ExtendSubscription([FromQuery] int months,[FromBody] Subscribes subscribe)
     {
@@ -180,7 +173,6 @@ public class CompanyController : ControllerBase
         }
     }
 
-    [EnableCors("User")]
     [AuthorizeByCompany]
     [HttpDelete("Deactivate/{companyId}")]
     public async Task<IActionResult> Deactivate([FromRoute]Guid companyId)
@@ -197,7 +189,6 @@ public class CompanyController : ControllerBase
         }
     }
 
-    [EnableCors("User")]
     [AuthorizeByCompany]
     [HttpDelete("Delete/{id}")]
     public async Task<IActionResult> Delete([FromRoute]Guid id)

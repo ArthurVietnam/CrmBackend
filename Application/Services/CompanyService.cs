@@ -126,6 +126,11 @@ public class CompanyService
         var company = await _repository.GetByIdAsync(companyId)
                       ?? throw new NotFoundException("Company not found");
 
+        if (dto.IsActive == false && company.IsActive)
+        {
+            dto.IsActive = true;
+        }
+
         _mapper.Map(dto, company);
         await _repository.UpdateAsync(company);
     }

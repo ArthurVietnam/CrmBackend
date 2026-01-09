@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Dtos.ClientDto;
+using Shared.Enums;
 
 namespace CrmPridnestrovye.Api.Controllers;
 
@@ -170,5 +171,4 @@ public class ClientController : ControllerBase
             return StatusCode(500, ex.Message);
         }
     }
-    /// TODO сделать обновление роли как в аппоинтменте
 }

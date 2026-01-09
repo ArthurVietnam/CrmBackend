@@ -1,10 +1,12 @@
-﻿using Aplication.Attributes.Authorization;
+﻿using System.Security.Claims;
+using Aplication.Attributes.Authorization;
 using Aplication.Exceptions;
 using Aplication.Services;
 using CrmPridnestrovye.Caching;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Dtos.UserDto;
+using Shared.Enums;
 
 namespace CrmPridnestrovye.Api.Controllers;
 
@@ -143,6 +145,56 @@ public class UserController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Error while updating password for user {userId}");
+            return StatusCode(500, ex.Message);
+        }
+    }
+    
+    [AuthorizeByUser]
+    [HttpPut("UpdateRole/{id}")]
+    public async Task<IActionResult> UpdateStatus([FromRoute]Guid id,[FromQuery] UserRole role)
+    {
+        try
+        {
+            var companyId = Guid.Parse(User.FindFirst("companyId").Value);
+            await _userService.UpdateRoleAsync(id, role);
+            await _cacheService.RemoveAsync($"users:{id}");
+            await _cacheService.RemoveAsync($"users:{companyId}:all");
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Error while updating role of user with id {id}");
+            return StatusCode(500, ex.Message);
+        }
+    }
+
+    [AuthorizeByUser]
+    [HttpPut("GetMyProfile")]
+    public async Task<IActionResult> GetMyProfile()
+    {
+        try
+        {
+            var role = User.FindFirst(ClaimTypes.Role).Value.ToString() ??
+                       throw new Exception("User has no role");
+            if (role != "User")
+            {
+                throw new Exception("User dont have \"User\" role");
+            }
+            
+            var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            
+            var cacheKey = $"users:{userId}";
+            var cached = await _cacheService.GetAsync<UserReadDto>(cacheKey);
+            if (cached != null)
+                return Ok(cached);
+
+            var user = await _userService.GetByIdAsync(userId);
+            await _cacheService.SetAsync(cacheKey, user);
+            return Ok(user);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error while getting user profile");
             return StatusCode(500, ex.Message);
         }
     }

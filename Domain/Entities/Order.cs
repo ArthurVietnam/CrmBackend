@@ -47,8 +47,7 @@ public class Order : BaseEntity
         Validate();
     }
 
-    public void Complete() => Status = StatusOfWork.Done;
-    public void Cancel() => Status = StatusOfWork.Canceled;
+    public void UpdateStatus(StatusOfWork status) => Status = status;
     
     public void UpdateCId(Guid cid)
     {

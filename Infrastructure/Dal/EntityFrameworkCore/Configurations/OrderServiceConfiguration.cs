@@ -15,6 +15,7 @@ public class OrderServiceConfiguration : IEntityTypeConfiguration<OrderService>
             .HasForeignKey(x => x.OrderId)
             .OnDelete(DeleteBehavior.Cascade);
             
+        /// TODO придумать что-то с удалением сервиса
         builder.HasOne(x => x.Service)
             .WithMany()
             .HasForeignKey(x => x.ServiceId)
