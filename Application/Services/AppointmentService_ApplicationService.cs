@@ -1,8 +1,9 @@
-﻿using Aplication.Exceptions;
+using Aplication.Exceptions;
 using Aplication.Interfaces.Repository;
 using AutoMapper;
 using Domain.Entities;
 using Shared.Dtos.AppointmentDto;
+using Shared.Dtos.AppointmentServiceDto;
 using Shared.Enums;
 
 namespace Aplication.Services;
@@ -10,15 +11,20 @@ namespace Aplication.Services;
 public class AppointmentService
 {
     private readonly IAppointmentRepository _repository;
+    private readonly AppointmentServiceService _appointmentServiceService;
     private readonly IMapper _mapper;
 
-    public AppointmentService(IAppointmentRepository repository, IMapper mapper)
+    public AppointmentService(
+        IAppointmentRepository repository,
+        AppointmentServiceService appointmentServiceService,
+        IMapper mapper)
     {
         _repository = repository;
+        _appointmentServiceService = appointmentServiceService;
         _mapper = mapper;
     }
 
-    public async Task<AppointmentReadDto> CreateAsync(AppointmentCreateDto dto,Guid companyId)
+    public async Task<AppointmentReadDto> CreateAsync(AppointmentCreateDto dto, Guid companyId)
     {
         var entity = _mapper.Map<Appointment>(dto);
         entity.UpdateCId(companyId);
@@ -26,14 +32,20 @@ public class AppointmentService
         return _mapper.Map<AppointmentReadDto>(entity);
     }
 
+    public async Task AddServiceToAppointmentAsync(AppointmentServiceCreateDto dto)
+    {
+        await _appointmentServiceService.CreateAsync(dto);
+    }
+
     public async Task<IReadOnlyList<AppointmentReadDto>> GetByCompany(Guid companyId)
     {
         var entities = await _repository.GetByCompanyAsync(companyId);
         return _mapper.Map<IReadOnlyList<AppointmentReadDto>>(entities);
     }
+
     public async Task<AppointmentReadDto> GetByIdAsync(Guid id)
     {
-        var entity = await _repository.GetByIdAsync(id) 
+        var entity = await _repository.GetByIdAsync(id)
                      ?? throw new NotFoundException("Appointment not found");
         return _mapper.Map<AppointmentReadDto>(entity);
     }
@@ -44,14 +56,12 @@ public class AppointmentService
         return _mapper.Map<IReadOnlyList<AppointmentReadDto>>(entities);
     }
 
-    public async Task UpdateAsync(AppointmentUpdateDto dto,Guid companyId,Guid id)
+    public async Task UpdateAsync(AppointmentUpdateDto dto, Guid companyId, Guid id)
     {
-        var entity = await _repository.GetByIdAsync(id) 
+        var entity = await _repository.GetByIdAsync(id)
                      ?? throw new NotFoundException("Appointment not found");
         if (entity.CompanyId != companyId)
-        {
             throw new NotFoundException("Appointment not found");
-        }
 
         _mapper.Map(dto, entity);
         entity.UpdateCId(companyId);
@@ -60,40 +70,34 @@ public class AppointmentService
 
     public async Task DeleteAsync(Guid id)
     {
-        var entity = await _repository.GetByIdAsync(id) 
+        var entity = await _repository.GetByIdAsync(id)
                      ?? throw new NotFoundException("Appointment not found");
         await _repository.DeleteAsync(entity);
     }
 
-    public async Task UpdateStatusAsync(Guid id,StatusOfWork status)
+    public async Task UpdateStatusAsync(Guid id, StatusOfWork status)
     {
-        var entity = await _repository.GetByIdAsync(id) 
+        var entity = await _repository.GetByIdAsync(id)
                      ?? throw new NotFoundException("Appointment not found");
         entity.UpdateStatus(status);
         await _repository.UpdateAsync(entity);
     }
 
-    public async Task<IReadOnlyList<AppointmentReadDto>> GetByDateAsync(DateTime date,Guid companyId)
+    public async Task<IReadOnlyList<AppointmentReadDto>> GetByDateAsync(DateTime date, Guid companyId)
     {
-        var entities = await _repository.GetByDateAsync(date,companyId);
+        var entities = await _repository.GetByDateAsync(date, companyId);
         return _mapper.Map<IReadOnlyList<AppointmentReadDto>>(entities);
     }
 
-    public async Task<IReadOnlyList<AppointmentReadDto>> GetByStatusAsync(StatusOfWork status,Guid companyId)
+    public async Task<IReadOnlyList<AppointmentReadDto>> GetByStatusAsync(StatusOfWork status, Guid companyId)
     {
-        var entities = await _repository.GetByStatusAsync(status,companyId);
+        var entities = await _repository.GetByStatusAsync(status, companyId);
         return _mapper.Map<IReadOnlyList<AppointmentReadDto>>(entities);
     }
 
     public async Task<IReadOnlyList<AppointmentReadDto>> GetByClientAsync(Guid clientId)
     {
         var entities = await _repository.GetByClientAsync(clientId);
-        return _mapper.Map<IReadOnlyList<AppointmentReadDto>>(entities);
-    }
-
-    public async Task<IReadOnlyList<AppointmentReadDto>> GetByServiceAsync(Guid serviceId)
-    {
-        var entities = await _repository.GetByServiceAsync(serviceId);
         return _mapper.Map<IReadOnlyList<AppointmentReadDto>>(entities);
     }
 }

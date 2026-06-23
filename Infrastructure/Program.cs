@@ -3,6 +3,7 @@ using Aplication.Interfaces;
 using Aplication.Interfaces.Repository;
 using Aplication.Mapping;
 using Aplication.Services;
+using Application.Services;
 using CrmPridnestrovye.Caching;
 using CrmPridnestrovye.Dal.EntityFrameworkCore;
 using CrmPridnestrovye.Dal.Repositories;
@@ -18,6 +19,7 @@ var builder = WebApplication.CreateBuilder(args);
 #region  Repositories
 
 builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
+builder.Services.AddScoped<IAppointmentServiceRepository, AppointmentServiceRepository>();
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
@@ -77,6 +79,7 @@ builder.Services.AddControllers()
 #region Services
 
 builder.Services.AddScoped<AppointmentService>();
+builder.Services.AddScoped<AppointmentServiceService>();
 builder.Services.AddScoped<ClientService>();
 builder.Services.AddScoped<CompanyService>();
 builder.Services.AddScoped<OrderServices>();
@@ -97,7 +100,7 @@ builder.Services.AddDataProtection()
 
 #region Mappers
 
-builder.Services.AddAutoMapper(typeof(AppointmentProfile), typeof(ClientProfile));
+builder.Services.AddAutoMapper(typeof(AppointmentProfile), typeof(AppointmentServiceProfile), typeof(ClientProfile));
 builder.Services.AddAutoMapper(typeof(CompanyProfile), typeof(OrderProfile));
 builder.Services.AddAutoMapper(typeof(OrderServiceProfile), typeof(ServiceProfile));
 builder.Services.AddAutoMapper(typeof(UserProfile),typeof(VerificationCodeProfile));
@@ -148,9 +151,6 @@ builder.Services.AddCors(options =>
             .AllowAnyHeader();
     });
 });
-
-
-
 
 #endregion
 

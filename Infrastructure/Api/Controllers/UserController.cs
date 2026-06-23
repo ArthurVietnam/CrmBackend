@@ -169,7 +169,7 @@ public class UserController : ControllerBase
     }
 
     [AuthorizeByUser]
-    [HttpPut("GetMyProfile")]
+    [HttpGet("GetMyProfile")]
     public async Task<IActionResult> GetMyProfile()
     {
         try

@@ -1,5 +1,5 @@
-﻿using Domain.Entities;
 using AutoMapper;
+using Domain.Entities;
 using Shared.Dtos.AppointmentDto;
 using Shared.Enums;
 
@@ -12,7 +12,7 @@ public class AppointmentProfile : Profile
         CreateMap<AppointmentCreateDto, Appointment>()
             .ForMember(dest => dest.Status, opt => opt.MapFrom(_ => StatusOfWork.Sheduled))
             .ForMember(dest => dest.Date, opt => opt.MapFrom(_ => DateTime.UtcNow));
-        
+
         CreateMap<Appointment, AppointmentReadDto>();
 
         CreateMap<AppointmentUpdateDto, Appointment>()

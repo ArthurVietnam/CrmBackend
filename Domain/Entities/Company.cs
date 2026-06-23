@@ -2,15 +2,15 @@
 using FluentValidation;
 using Shared.Enums;
 
-namespace Domain.Entities;
+namespace Domain.Entities;// TODO убраиь флаг isactive и бэуграунд джоб
 public class Company : BaseEntity
 {
     public string Name { get; private set; }
     public string Location { get; private set; }
-    public bool IsActive { get; private set; } = false;
     public string Email { get; private set; }
     public string Password { get; private set; }
     public Subscribes Subscribe { get; private set; }
+    public bool IsActive { get; private set; }
     public DateTime SubscriptionEnd { get; private set; }
     
     public ICollection<User> Users { get; } = new List<User>();
@@ -18,7 +18,6 @@ public class Company : BaseEntity
     public ICollection<Service> Services { get; } = new List<Service>();
     public ICollection<Order> Orders { get; } = new List<Order>();
     public ICollection<Appointment> Appointments { get; } = new List<Appointment>();
-    public ICollection<OrderService> OrderServices { get; } = new List<OrderService>();
 
     private Company() { }
 

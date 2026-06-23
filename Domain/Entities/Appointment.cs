@@ -1,4 +1,4 @@
-﻿using Domain.Validations.Validators;
+using Domain.Validations.Validators;
 using FluentValidation;
 using Shared.Enums;
 
@@ -7,12 +7,10 @@ namespace Domain.Entities;
 public class Appointment : BaseEntity
 {
     public DateTime Date { get; private set; }
-    
+
     public Guid ClientId { get; private set; }
     public Client Client { get; private set; }
-
-    public Guid ServiceId { get; private set; }
-    public Service Service { get; private set; }
+    public decimal Sum => AppointmentServices.Sum(os => os.TotalPrice);
 
     public Guid CompanyId { get; private set; }
     public Company Company { get; private set; }
@@ -21,19 +19,20 @@ public class Appointment : BaseEntity
     public string? Comment { get; private set; }
     public StatusOfWork Status { get; private set; } = StatusOfWork.Sheduled;
 
+    public ICollection<AppointmentService> AppointmentServices { get; } = new List<AppointmentService>();
+
     private Appointment() { }
 
-    public Appointment(Guid clientId, Guid serviceId, Guid companyId, DateTime dateTime, string? comment = null)
+    public Appointment(Guid clientId, Guid companyId, DateTime dateTime, string? comment = null)
     {
         Date = DateTime.UtcNow;
         ClientId = clientId;
-        ServiceId = serviceId;
         CompanyId = companyId;
         DateTime = dateTime;
         Comment = comment;
         Validate();
     }
-    
+
     private void Validate()
     {
         var validator = new AppointmentValidator();
@@ -55,7 +54,7 @@ public class Appointment : BaseEntity
     }
 
     public void UpdateStatus(StatusOfWork status) => Status = status;
-    
+
     public void UpdateCId(Guid cid)
     {
         CompanyId = cid;

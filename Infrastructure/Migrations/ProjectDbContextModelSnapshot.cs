@@ -44,7 +44,7 @@ namespace CrmPridnestrovye.Migrations
                     b.Property<DateTime>("DateTime")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("ServiceId")
+                    b.Property<Guid?>("ServiceId")
                         .HasColumnType("uuid");
 
                     b.Property<int>("Status")
@@ -58,7 +58,34 @@ namespace CrmPridnestrovye.Migrations
 
                     b.HasIndex("ServiceId");
 
-                    b.ToTable("Appointment", (string)null);
+                    b.ToTable("Appointment");
+                });
+
+            modelBuilder.Entity("Domain.Entities.AppointmentService", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AppointmentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<long>("Count")
+                        .HasColumnType("bigint");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("numeric");
+
+                    b.Property<Guid?>("ServiceId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AppointmentId");
+
+                    b.HasIndex("ServiceId");
+
+                    b.ToTable("AppointmentService");
                 });
 
             modelBuilder.Entity("Domain.Entities.Client", b =>
@@ -88,7 +115,7 @@ namespace CrmPridnestrovye.Migrations
 
                     b.HasIndex("CompanyId");
 
-                    b.ToTable("Clients", (string)null);
+                    b.ToTable("Clients");
                 });
 
             modelBuilder.Entity("Domain.Entities.Company", b =>
@@ -128,7 +155,10 @@ namespace CrmPridnestrovye.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Company", (string)null);
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.ToTable("Company");
                 });
 
             modelBuilder.Entity("Domain.Entities.Order", b =>
@@ -158,16 +188,13 @@ namespace CrmPridnestrovye.Migrations
 
                     b.HasIndex("CompanyId");
 
-                    b.ToTable("Orders", (string)null);
+                    b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("Domain.Entities.OrderService", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("CompanyId")
                         .HasColumnType("uuid");
 
                     b.Property<long>("Count")
@@ -179,18 +206,16 @@ namespace CrmPridnestrovye.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("numeric");
 
-                    b.Property<Guid>("ServiceId")
+                    b.Property<Guid?>("ServiceId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CompanyId");
 
                     b.HasIndex("OrderId");
 
                     b.HasIndex("ServiceId");
 
-                    b.ToTable("OrderServices", (string)null);
+                    b.ToTable("OrderServices");
                 });
 
             modelBuilder.Entity("Domain.Entities.RefreshToken", b =>
@@ -239,7 +264,7 @@ namespace CrmPridnestrovye.Migrations
 
                     b.HasIndex("CompanyId");
 
-                    b.ToTable("Services", (string)null);
+                    b.ToTable("Services");
                 });
 
             modelBuilder.Entity("Domain.Entities.User", b =>
@@ -274,7 +299,7 @@ namespace CrmPridnestrovye.Migrations
 
                     b.HasIndex("CompanyId");
 
-                    b.ToTable("User", (string)null);
+                    b.ToTable("User");
                 });
 
             modelBuilder.Entity("Domain.Entities.VerificationCode", b =>
@@ -297,7 +322,7 @@ namespace CrmPridnestrovye.Migrations
 
                     b.HasIndex("CompanyId");
 
-                    b.ToTable("VerificationCode", (string)null);
+                    b.ToTable("VerificationCode");
                 });
 
             modelBuilder.Entity("Domain.Entities.Appointment", b =>
@@ -314,15 +339,28 @@ namespace CrmPridnestrovye.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.Service", "Service")
+                    b.HasOne("Domain.Entities.Service", null)
                         .WithMany("Appointments")
-                        .HasForeignKey("ServiceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ServiceId");
 
                     b.Navigation("Client");
 
                     b.Navigation("Company");
+                });
+
+            modelBuilder.Entity("Domain.Entities.AppointmentService", b =>
+                {
+                    b.HasOne("Domain.Entities.Appointment", "Appointment")
+                        .WithMany("AppointmentServices")
+                        .HasForeignKey("AppointmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.Service", "Service")
+                        .WithMany()
+                        .HasForeignKey("ServiceId");
+
+                    b.Navigation("Appointment");
 
                     b.Navigation("Service");
                 });
@@ -358,10 +396,6 @@ namespace CrmPridnestrovye.Migrations
 
             modelBuilder.Entity("Domain.Entities.OrderService", b =>
                 {
-                    b.HasOne("Domain.Entities.Company", null)
-                        .WithMany("OrderServices")
-                        .HasForeignKey("CompanyId");
-
                     b.HasOne("Domain.Entities.Order", "Order")
                         .WithMany("OrderServices")
                         .HasForeignKey("OrderId")
@@ -371,8 +405,7 @@ namespace CrmPridnestrovye.Migrations
                     b.HasOne("Domain.Entities.Service", "Service")
                         .WithMany()
                         .HasForeignKey("ServiceId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Order");
 
@@ -412,6 +445,11 @@ namespace CrmPridnestrovye.Migrations
                     b.Navigation("Company");
                 });
 
+            modelBuilder.Entity("Domain.Entities.Appointment", b =>
+                {
+                    b.Navigation("AppointmentServices");
+                });
+
             modelBuilder.Entity("Domain.Entities.Client", b =>
                 {
                     b.Navigation("Appointments");
@@ -424,8 +462,6 @@ namespace CrmPridnestrovye.Migrations
                     b.Navigation("Appointments");
 
                     b.Navigation("Clients");
-
-                    b.Navigation("OrderServices");
 
                     b.Navigation("Orders");
 

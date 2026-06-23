@@ -1,42 +1,43 @@
-﻿using Domain.Validations.Validators;
+using Domain.Validations.Validators;
 using FluentValidation;
 
 namespace Domain.Entities;
-public class OrderService : BaseEntity
+
+public class AppointmentService : BaseEntity
 {
-    public Order Order { get; private set; }
-    public Guid OrderId { get; private set; }
+    public Appointment Appointment { get; private set; }
+    public Guid AppointmentId { get; private set; }
     public Service? Service { get; private set; }
     public Guid? ServiceId { get; private set; }
     public uint Count { get; private set; }
     public decimal Price { get; private set; }
-    public decimal TotalPrice => Count * Price; 
+    public decimal TotalPrice => Count * Price;
 
-    private OrderService() { }
+    private AppointmentService() { }
 
-    public OrderService(Guid orderId, Guid serviceId, uint count, decimal price)
+    public AppointmentService(Guid appointmentId, Guid serviceId, uint count, decimal price)
     {
-        OrderId = orderId;
+        AppointmentId = appointmentId;
         ServiceId = serviceId;
         Count = count;
         Price = price;
         Validate();
     }
-    
+
     private void Validate()
     {
-        var validator = new OrderServiceValidator();
+        var validator = new AppointmentServiceValidator();
         var result = validator.Validate(this);
         if (!result.IsValid)
         {
             throw new ValidationException(
-                $"Error occured validation {nameof(OrderService)}:\n" +
+                $"Error occured validation {nameof(AppointmentService)}:\n" +
                 string.Join("\n", result.Errors.Select(e => e.ErrorMessage))
             );
         }
     }
 
-    public void Update(OrderService updated)
+    public void Update(AppointmentService updated)
     {
         Count = updated.Count;
         Price = updated.Price;
