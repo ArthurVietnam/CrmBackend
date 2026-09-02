@@ -129,9 +129,6 @@ namespace CrmPridnestrovye.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
-
                     b.Property<string>("Location")
                         .IsRequired()
                         .HasMaxLength(150)

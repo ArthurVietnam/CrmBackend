@@ -18,7 +18,7 @@ public class CompanyRepository : BaseRepository<Company>, ICompanyRepository
     public async Task<IReadOnlyList<Company>> GetActiveCompaniesAsync()
     {
         return await _dbSet
-            .Where(c => c.IsActive)
+            .Where(c => c.SubscriptionEnd > DateTime.Now)
             .ToListAsync();
     }
 
@@ -29,20 +29,11 @@ public class CompanyRepository : BaseRepository<Company>, ICompanyRepository
             .Where(c => c.SubscriptionEnd < now)
             .ToListAsync();
     }
-
-    public async Task<bool> DeactivateCompanyAsync(Guid companyId)
-    {
-        var company = await GetByIdAsync(companyId);
-        if (company == null) return false;
-        
-        company.Deactivate();
-        await UpdateAsync(company);
-        return true;
-    }
+    
     
     public async Task<bool> IsSubscriptionActiveAsync(Guid companyId)
     {
         var company = await _dbSet.FirstOrDefaultAsync(c => c.Id == companyId);
-        return company?.IsActive ?? false;
+        return company?.SubscriptionEnd > DateTime.Now;
     }
 }

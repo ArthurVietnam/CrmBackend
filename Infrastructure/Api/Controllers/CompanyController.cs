@@ -174,22 +174,6 @@ public class CompanyController : ControllerBase
     }
 
     [AuthorizeByCompany]
-    [HttpDelete("Deactivate/{companyId}")]
-    public async Task<IActionResult> Deactivate([FromRoute]Guid companyId)
-    {
-        try
-        {
-            await _companyService.DeactivateCompanyAsync(companyId);
-            return Ok();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"Error while deactivating company with id {companyId}");
-            return StatusCode(500, ex.Message);
-        }
-    }
-
-    [AuthorizeByCompany]
     [HttpDelete("Delete/{id}")]
     public async Task<IActionResult> Delete([FromRoute]Guid id)
     {

@@ -3,7 +3,6 @@ using Aplication.Interfaces;
 using Aplication.Interfaces.Repository;
 using Aplication.Mapping;
 using Aplication.Services;
-using Application.Services;
 using CrmPridnestrovye.Caching;
 using CrmPridnestrovye.Dal.EntityFrameworkCore;
 using CrmPridnestrovye.Dal.Repositories;
@@ -90,7 +89,6 @@ builder.Services.AddScoped<VerificationService>();
 builder.Services.AddScoped<JwtService>();
 builder.Services.AddScoped<IReportService, ReportService>();
 
-builder.Services.AddHostedService<SubscriptionDeactivationService>();
 
 builder.Services.AddDataProtection()
     .PersistKeysToFileSystem(new DirectoryInfo("/app/keys"))

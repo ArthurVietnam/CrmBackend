@@ -2,7 +2,7 @@
 using FluentValidation;
 using Shared.Enums;
 
-namespace Domain.Entities;// TODO убраиь флаг isactive и бэуграунд джоб
+namespace Domain.Entities;
 public class Company : BaseEntity
 {
     public string Name { get; private set; }
@@ -10,7 +10,6 @@ public class Company : BaseEntity
     public string Email { get; private set; }
     public string Password { get; private set; }
     public Subscribes Subscribe { get; private set; }
-    public bool IsActive { get; private set; }
     public DateTime SubscriptionEnd { get; private set; }
     
     public ICollection<User> Users { get; } = new List<User>();
@@ -56,17 +55,13 @@ public class Company : BaseEntity
     {
         var start = SubscriptionEnd > DateTime.UtcNow ? SubscriptionEnd : DateTime.UtcNow;
         Subscribe = subscribe;
-        Activate();
         SubscriptionEnd = start.AddMonths(months);
     }
     
     public void ExtendSubscriptionByDays(int days)
     {
         var start = SubscriptionEnd > DateTime.UtcNow ? SubscriptionEnd : DateTime.UtcNow;
-        Activate();
         SubscriptionEnd = start.AddDays(days);
     }
 
-    public void Deactivate() => IsActive = false;
-    public void Activate() => IsActive = true;
 }

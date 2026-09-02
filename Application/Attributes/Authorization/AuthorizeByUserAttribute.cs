@@ -18,8 +18,9 @@ public class AuthorizeByUserAttribute : AuthorizeAttribute, IAsyncAuthorizationF
 
         var isUser = user.Claims.Any(c => (c.Type == "role" || c.Type == ClaimTypes.Role) && c.Value == "User");
         var isCompany = user.Claims.Any(c => (c.Type == "role" || c.Type == ClaimTypes.Role) && c.Value == "Company");
+        var isActive = user.Claims.Any(c => (c.Type == "expired") && DateTime.Parse(c.Value) > DateTime.Now);
 
-        if (!isUser && !isCompany)
+        if (!isUser && !isCompany && !isActive)
         {
             context.Result = new Microsoft.AspNetCore.Mvc.UnauthorizedResult();
         }

@@ -32,7 +32,7 @@ public class AuthController : ControllerBase
         {
 
             var company = await _companyService.LoginAsync(request.Email, request.Password);
-            var accessToken = _jwtService.GenerateAccessToken(company.Id, company.Email, "Company",company.Id);
+            var accessToken = _jwtService.GenerateAccessToken(company.Id, company.Email, "Company",company.Id,company.SubscriptionEnd);
             var refreshToken = await _jwtService.GenerateRefreshToken(company.Id);
 
             return Ok(new { AccessToken = accessToken, RefreshToken = refreshToken });
@@ -52,8 +52,9 @@ public class AuthController : ControllerBase
         {
             var user = await _userService.ValidateUserAsync(request.Email, request.Password);
             var companyId = await _userService.GetCompanyIdByEmail(request.Email);
-
-            var accessToken = _jwtService.GenerateAccessToken(user.Id, user.Email, "User",companyId);
+            var company = await _companyService.GetByIdAsync(companyId);
+            
+            var accessToken = _jwtService.GenerateAccessToken(user.Id, user.Email, "User",companyId,company.SubscriptionEnd);
             var refreshToken = await _jwtService.GenerateRefreshToken(user.Id);
 
             return Ok(new { AccessToken = accessToken, RefreshToken = refreshToken });
@@ -91,13 +92,9 @@ public class AuthController : ControllerBase
                 return Unauthorized("Invalid or expired refresh token");
 
             var company = await _companyService.GetByIdAsync(refreshToken.UserId);
-            if (!company.IsActive)
-            {
-                return Unauthorized("Out of subscribe");
-            }
             
 
-            var newAccess = _jwtService.GenerateAccessToken(refreshToken.UserId, company.Email, "Company",refreshToken.UserId);
+            var newAccess = _jwtService.GenerateAccessToken(refreshToken.UserId, company.Email, "Company",refreshToken.UserId,company.SubscriptionEnd);
 
             return Ok(new { AccessToken = newAccess});
         }
@@ -122,12 +119,8 @@ public class AuthController : ControllerBase
             var companyId = await _userService.GetCompanyIdByEmail(user.Email);
 
             var company = await _companyService.GetByIdAsync(companyId);
-            if (!company.IsActive)
-            {
-                return Unauthorized("Out of subscribe");
-            }
             
-            var newAccess = _jwtService.GenerateAccessToken(user.Id, user.Email, user.Role.ToString(),companyId);
+            var newAccess = _jwtService.GenerateAccessToken(user.Id, user.Email, user.Role.ToString(),companyId,company.SubscriptionEnd);
 
             return Ok(new { AccessToken = newAccess});
         }

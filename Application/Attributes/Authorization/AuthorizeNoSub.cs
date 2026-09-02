@@ -1,10 +1,10 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Aplication.Attributes.Authorization;
 
-public class AuthorizeByCompanyAttribute : AuthorizeAttribute, IAsyncAuthorizationFilter
+public class AuthorizeNoSub: AuthorizeAttribute, IAsyncAuthorizationFilter
 {
     public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
     {
@@ -15,14 +15,13 @@ public class AuthorizeByCompanyAttribute : AuthorizeAttribute, IAsyncAuthorizati
             context.Result = new Microsoft.AspNetCore.Mvc.UnauthorizedResult();
             return;
         }
-
-        var isCompany = user.Claims.Any(c => 
-            (c.Type == "role" || c.Type == ClaimTypes.Role) && c.Value == "Company");
-        var isActive = user.Claims.Any(c => (c.Type == "expired") && DateTime.Parse(c.Value) > DateTime.Now);
         
-        if (!isCompany || !isActive)
+        var isCompany = user.Claims.Any(c => (c.Type == "role" || c.Type == ClaimTypes.Role) && c.Value == "Company");
+
+        if (!isCompany)
         {
             context.Result = new Microsoft.AspNetCore.Mvc.UnauthorizedResult();
         }
     }
+    
 }

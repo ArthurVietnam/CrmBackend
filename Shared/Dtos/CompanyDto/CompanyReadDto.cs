@@ -8,7 +8,6 @@ public class CompanyReadDto
     public string Location { get; init; }
     public string Password { get; init; }
     public string Email { get; init; }
-    public bool IsActive { get; init; }
     public Subscribes Subscribe { get; init; }
     public DateTime SubscriptionEnd { get; init; }
 }

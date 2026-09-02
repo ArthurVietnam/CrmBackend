@@ -20,7 +20,7 @@ public class JwtService
         _refreshTokenRepo = refreshTokenRepo;
     }
 
-    public string GenerateAccessToken(Guid id, string email, string role,Guid companyId)
+    public string GenerateAccessToken(Guid id, string email, string role,Guid companyId, DateTime expireDate)
     {
         
         var claims = new List<Claim>
@@ -28,7 +28,8 @@ public class JwtService
             new Claim(ClaimTypes.NameIdentifier, id.ToString()),
             new Claim(ClaimTypes.Email, email),
             new Claim(ClaimTypes.Role, role),
-            new Claim("companyId",companyId.ToString())
+            new Claim("companyId",companyId.ToString()),
+            new Claim(ClaimTypes.Expiration, expireDate.ToString("yyyy-MM-dd"))
         };
         
         var key = _config["JwtSettings:Secret"];

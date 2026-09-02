@@ -104,7 +104,7 @@ public class OrderController : ControllerBase
             return StatusCode(500, ex.Message);
         }
     }
-
+    
     [HttpDelete("Delete/{id}")]
     public async Task<IActionResult> Delete([FromRoute]Guid id)
     {
@@ -157,7 +157,8 @@ public class OrderController : ControllerBase
             return StatusCode(500, ex.Message);
         }
     }
-
+    
+    [AuthorizeNoSub]
     [HttpGet("GetByCompany")]
     public async Task<IActionResult> GetByCompany()
     {

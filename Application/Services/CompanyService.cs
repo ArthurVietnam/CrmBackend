@@ -114,18 +114,12 @@ public class CompanyService
         company.ExtendSubscriptionByMonths(months,subscribe);
         await _repository.UpdateAsync(company);
     }
-
-    public async Task DeactivateCompanyAsync(Guid companyId)
-    {
-        var result = await _repository.DeactivateCompanyAsync(companyId);
-        if (!result) throw new Exception("Deactivation failed");
-    }
+    
 
     public async Task UpdateAsync(CompanyUpdateDto dto,Guid companyId)
     {
         var company = await _repository.GetByIdAsync(companyId)
                       ?? throw new NotFoundException("Company not found");
-        dto.IsActive = company.IsActive;
 
         _mapper.Map(dto, company);
         await _repository.UpdateAsync(company);
@@ -142,9 +136,6 @@ public class CompanyService
     {
         var company = await _repository.GetByEmailAsync(email)
                       ?? throw new NotFoundException("Company not found");
-        
-        if (!company.IsActive)
-            throw new Exception("Out of subscribe");
         
         if (company.Password == password)
         {
