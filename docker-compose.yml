@@ -14,7 +14,7 @@ services:
         condition: service_healthy
     environment:
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}
-      - JwtSettings__Secret=${JWT_SECRET:-apo76AIS8JDhj75fop5sadi3jfhpjPO780IAfposaFf545123}
+      - JwtSettings__Secret=${JWT_SECRET:-devSecretForLocalDevelopmentOnly1234567890}
       - ConnectionStrings__DefaultConnection=Host=crm-db;Port=5432;Database=${POSTGRES_DB:-devdb};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:-postgres}
     volumes:
       - data_protection_keys:/app/keys
