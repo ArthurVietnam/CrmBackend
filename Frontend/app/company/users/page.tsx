@@ -45,7 +45,7 @@ export default function UsersPage() {
       (user) =>
         user.Name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         user.Email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        user.Phone.toLowerCase().includes(searchQuery.toLowerCase()),
+        (user.Phone ?? "").toLowerCase().includes(searchQuery.toLowerCase()),
     )
     setFilteredUsers(filtered)
   }, [searchQuery, users])
@@ -158,7 +158,7 @@ export default function UsersPage() {
   }
 
   const getRoleBadge = (role: number) => {
-    const config = {
+    const config: Record<number, { label: string; variant: "secondary" | "default" }> = {
       [UserRole.Employee]: { label: "Employee", variant: "secondary" as const },
       [UserRole.Admin]: { label: "Admin", variant: "default" as const },
     }
@@ -262,7 +262,9 @@ export default function UsersPage() {
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         user={editingUser}
-        onSubmit={editingUser ? handleUpdate : handleCreate}
+        onSubmit={(data) =>
+          editingUser ? handleUpdate(data as UserUpdateDto) : handleCreate(data as UserCreateDto)
+        }
       />
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>

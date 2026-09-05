@@ -117,7 +117,7 @@ export default function AppointmentsPage() {
   const handleUpdate = async (data: AppointmentUpdateDto) => {
     if (!editingAppointment) return
     try {
-      await appointmentsApi.update(editingAppointment.Id, data)
+      await appointmentsApi.update(Number(editingAppointment.Id), data)
       toast({
         title: "Success",
         description: "Appointment updated successfully",
@@ -156,7 +156,7 @@ export default function AppointmentsPage() {
   const handleDelete = async () => {
     if (!appointmentToDelete) return
     try {
-      await appointmentsApi.delete(appointmentToDelete.Id)
+      await appointmentsApi.delete(Number(appointmentToDelete.Id))
       toast({
         title: "Success",
         description: "Appointment deleted successfully",
@@ -335,7 +335,9 @@ export default function AppointmentsPage() {
         appointment={editingAppointment}
         clients={clients}
         services={services}
-        onSubmit={editingAppointment ? handleUpdate : handleCreate}
+        onSubmit={(data) =>
+          editingAppointment ? handleUpdate(data as AppointmentUpdateDto) : handleCreate(data as AppointmentCreateDto)
+        }
       />
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>

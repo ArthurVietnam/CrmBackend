@@ -41,8 +41,8 @@ export default function ClientsPage() {
     const filtered = clients.filter(
       (client) =>
         client.Name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        client.Email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        client.Phone.includes(searchQuery),
+        (client.Email ?? "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (client.Phone ?? "").includes(searchQuery),
     )
     setFilteredClients(filtered)
   }, [searchQuery, clients])
@@ -84,7 +84,7 @@ export default function ClientsPage() {
   const handleUpdate = async (data: ClientUpdateDto) => {
     if (!editingClient) return
     try {
-      await clientsApi.update(editingClient.Id, data)
+      await clientsApi.update(Number(editingClient.Id), data)
       toast({
         title: "Success",
         description: "Client updated successfully",
@@ -104,7 +104,7 @@ export default function ClientsPage() {
   const handleDelete = async () => {
     if (!clientToDelete) return
     try {
-      await clientsApi.delete(clientToDelete.Id)
+      await clientsApi.delete(Number(clientToDelete.Id))
       toast({
         title: "Success",
         description: "Client deleted successfully",
@@ -219,7 +219,9 @@ export default function ClientsPage() {
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         client={editingClient}
-        onSubmit={editingClient ? handleUpdate : handleCreate}
+        onSubmit={(data) =>
+          editingClient ? handleUpdate(data as ClientUpdateDto) : handleCreate(data as ClientCreateDto)
+        }
       />
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>

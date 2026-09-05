@@ -22,7 +22,7 @@ export const authApi = {
     return response
   },
 
-  // Backend: POST /api/Company/CompanyCreate -> returns 201 with no body (no tokens).
+  // Backend: POST /api/Auth/CompanyCreate -> returns 201 with no body (no tokens).
   // The company must log in separately after registering.
   async registerCompany(data: CompanyCreateDto): Promise<void> {
     await apiClient.post<void>("/api/Auth/CompanyCreate", data)

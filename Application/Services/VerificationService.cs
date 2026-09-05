@@ -9,32 +9,37 @@ public class VerificationService
 {
     private readonly IVerificationCodeRepository _repository;
     private readonly ICompanyRepository _companyRepository;
+    private readonly IEmailService _emailService;
 
     public VerificationService(
         IVerificationCodeRepository repository,
-        ICompanyRepository companyRepository)
+        ICompanyRepository companyRepository,
+        IEmailService emailService)
     {
         _repository = repository;
         _companyRepository = companyRepository;
+        _emailService = emailService;
     }
 
     private async Task<string> GenerateCodeAsync(Guid companyId)
     {
         await _repository.InvalidateOldCodesAsync(companyId);
-        
+
         var company = await _companyRepository.GetByIdAsync(companyId)
         ?? throw new NotFoundException("Company not Found");
-        
+
         var existingCode = await _repository.GetActiveCodeForCompanyAsync(companyId);
         if (existingCode != null && existingCode.ExpirationTime > DateTime.UtcNow)
         {
             return existingCode.Code;
         }
 
-        var code = await EmailService.SendVerificationCodeAsync(company.Email,EmailService.GenerateToken());
+        var code = _emailService.GenerateToken();
+        await _emailService.SendVerificationCodeAsync(company.Email, code);
+
         var verificationCode = new VerificationCode(companyId, code);
-        
         await _repository.AddAsync(verificationCode);
+
         return code;
     }
 
@@ -50,11 +55,10 @@ public class VerificationService
 
     public async Task<bool> ResendCodeAsync(Guid companyId)
     {
-        var company = await _companyRepository.GetByIdAsync(companyId)
+        _ = await _companyRepository.GetByIdAsync(companyId)
                     ?? throw new NotFoundException("Company not Found");
-        
-        var code = await GenerateCodeAsync(companyId);
-        await EmailService.SendVerificationCodeAsync(company.Email, code);
+
+        await GenerateCodeAsync(companyId);
 
         return true;
     }
@@ -63,12 +67,12 @@ public class VerificationService
     {
         var company = await _companyRepository.GetByIdAsync(companyId)
                       ?? throw new NotFoundException("Company not found");
-        
+
         if (!await VerifyCodeAsync(companyId, code))
         {
             return false;
         }
-        
+
         company.ExtendSubscriptionByDays(7);
         await _companyRepository.UpdateAsync(company);
         return true;

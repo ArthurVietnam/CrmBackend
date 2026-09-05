@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { servicesApi } from "@/lib/api/services"
-import type { ServiceReadDto } from "@/lib/types/dtos"
+import type { ServiceReadDto, ServiceCreateDto } from "@/lib/types/dtos"
 import { useToast } from "@/hooks/use-toast"
 import { Search, Plus, Pencil, Trash2 } from "lucide-react"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -67,7 +67,7 @@ export default function UserServicesPage() {
   const handleUpdate = async (data: any) => {
     if (!editingService) return
     try {
-      await servicesApi.update(editingService.Id, data)
+      await servicesApi.update(Number(editingService.Id), data)
       toast({
         title: "Success",
         description: "Service updated successfully",
@@ -87,7 +87,7 @@ export default function UserServicesPage() {
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this service?")) return
     try {
-      await servicesApi.delete(id)
+      await servicesApi.delete(Number(id))
       toast({
         title: "Success",
         description: "Service deleted successfully",
@@ -190,8 +190,8 @@ export default function UserServicesPage() {
       <ServiceDialog
         open={dialogOpen}
         onOpenChange={setDialogOpen}
-        service={editingService}
-        onSubmit={editingService ? handleUpdate : handleCreate}
+        service={editingService ?? null}
+        onSubmit={editingService ? (data) => handleUpdate(data) : (data) => handleCreate(data as ServiceCreateDto)}
       />
     </div>
   )

@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { clientsApi } from "@/lib/api/clients"
-import type { ClientReadDto } from "@/lib/types/dtos"
+import type { ClientReadDto, ClientCreateDto } from "@/lib/types/dtos"
 import { useToast } from "@/hooks/use-toast"
 import { Search, Plus, Pencil, Trash2 } from "lucide-react"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -72,7 +72,7 @@ export default function UserClientsPage() {
   const handleUpdate = async (data: any) => {
     if (!editingClient) return
     try {
-      await clientsApi.update(editingClient.Id, data)
+      await clientsApi.update(Number(editingClient.Id), data)
       toast({
         title: "Success",
         description: "Client updated successfully",
@@ -92,7 +92,7 @@ export default function UserClientsPage() {
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this client?")) return
     try {
-      await clientsApi.delete(id)
+      await clientsApi.delete(Number(id))
       toast({
         title: "Success",
         description: "Client deleted successfully",
@@ -199,8 +199,8 @@ export default function UserClientsPage() {
       <ClientDialog
         open={dialogOpen}
         onOpenChange={setDialogOpen}
-        client={editingClient}
-        onSubmit={editingClient ? handleUpdate : handleCreate}
+        client={editingClient ?? null}
+        onSubmit={(data) => editingClient ? handleUpdate(data) : handleCreate(data as ClientCreateDto)}
       />
     </div>
   )

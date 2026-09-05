@@ -38,14 +38,12 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
       <header className="border-b">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
+            <Link href="/" className="flex items-center gap-2" aria-label="CRM System home">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
                 <User className="h-5 w-5 text-primary-foreground" />
               </div>
-              <div>
-                <h1 className="text-xl font-bold">User Portal</h1>
-              </div>
-            </div>
+              <div><h1 className="text-xl font-bold">CRM System</h1><p className="text-xs text-muted-foreground">User Portal</p></div>
+            </Link>
             <Button variant="outline" onClick={handleLogout}>
               <LogOut className="mr-2 h-4 w-4" />
               Logout
