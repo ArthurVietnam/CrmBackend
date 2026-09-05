@@ -81,7 +81,7 @@ export default function ServicesPage() {
   const handleUpdate = async (data: ServiceUpdateDto) => {
     if (!editingService) return
     try {
-      await servicesApi.update(editingService.Id, data)
+      await servicesApi.update(Number(editingService.Id), data)
       toast({
         title: "Success",
         description: "Service updated successfully",
@@ -102,7 +102,7 @@ export default function ServicesPage() {
   const handleDelete = async () => {
     if (!serviceToDelete) return
     try {
-      await servicesApi.delete(serviceToDelete.Id)
+      await servicesApi.delete(Number(serviceToDelete.Id))
       toast({
         title: "Success",
         description: "Service deleted successfully",
@@ -214,7 +214,11 @@ export default function ServicesPage() {
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         service={editingService}
-        onSubmit={editingService ? handleUpdate : handleCreate}
+        onSubmit={(data) =>
+          editingService
+            ? handleUpdate(data as ServiceUpdateDto)
+            : handleCreate(data as ServiceCreateDto)
+        }
       />
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>

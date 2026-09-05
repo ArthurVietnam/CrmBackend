@@ -105,7 +105,7 @@ public class CompanyController : ControllerBase
     }
     
 
-    [AuthorizeByCompany]
+    [AuthorizeNoSub]
     [HttpPost("ResendCode")]
     public async Task<IActionResult> ResendCode([FromQuery] Guid companyId)
     {
@@ -121,7 +121,7 @@ public class CompanyController : ControllerBase
         }
     }
     
-    [AuthorizeByCompany]
+    [AuthorizeNoSub]
     [HttpPost("ConfirmCode")]
     public async Task<IActionResult> ConfirmCode([FromQuery] Guid companyId,[FromQuery] string code)
     {
@@ -189,7 +189,7 @@ public class CompanyController : ControllerBase
         }
     }
 
-    [AuthorizeByCompany]
+    [AuthorizeNoSub]
     [HttpGet("GetStatistics")]
     public async Task<IActionResult> GetStatistics()
     {
@@ -206,7 +206,7 @@ public class CompanyController : ControllerBase
         }
     }
     
-    [AuthorizeByCompany]
+    [AuthorizeNoSub]
     [HttpGet("GetMyCompany")]
     public async Task<IActionResult> GetMyCompany()
     {

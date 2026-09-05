@@ -11,11 +11,11 @@ services:
       - "5000:8080"
     depends_on:
       postgres:
-        condition: service_healthy 
+        condition: service_healthy
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - JwtSettings__Secret=apo76AIS8JDhj75fop5sadi3jfhpjPO780IAfposaFf545123
-      - ConnectionStrings__DefaultConnection=Host=crm-db;Port=5432;Database=devdb;Username=postgres;Password=postgres
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}
+      - JwtSettings__Secret=${JWT_SECRET:-apo76AIS8JDhj75fop5sadi3jfhpjPO780IAfposaFf545123}
+      - ConnectionStrings__DefaultConnection=Host=crm-db;Port=5432;Database=${POSTGRES_DB:-devdb};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:-postgres}
     volumes:
       - data_protection_keys:/app/keys
     networks:
@@ -23,18 +23,18 @@ services:
 
   postgres:
     image: postgres:16
-    container_name: crm-db 
+    container_name: crm-db
     restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: devdb  
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-devdb}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - crm-network
-    healthcheck: 
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -43,6 +43,21 @@ services:
     image: redis:7
     container_name: crm-redis
     restart: always
+    networks:
+      - crm-network
+
+  crm-frontend:
+    build:
+      context: ./Frontend
+      dockerfile: Dockerfile
+    container_name: crm-frontend
+    restart: always
+    ports:
+      - "3000:3000"
+    depends_on:
+      - crm-backend
+    environment:
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:5000}
     networks:
       - crm-network
 

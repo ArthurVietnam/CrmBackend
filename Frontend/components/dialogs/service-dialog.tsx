@@ -29,6 +29,7 @@ export function ServiceDialog({ open, onOpenChange, service, onSubmit }: Service
       ? {
           ServiceName: (formData.get("name") as string) || undefined,
           Price: formData.get("price") ? Number.parseFloat(formData.get("price") as string) : undefined,
+          Id: service.Id,
         }
       : {
           ServiceName: formData.get("name") as string,

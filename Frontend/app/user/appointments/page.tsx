@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button"
 import { appointmentsApi } from "@/lib/api/appointments"
 import { clientsApi } from "@/lib/api/clients"
 import { servicesApi } from "@/lib/api/services"
-import type { AppointmentReadDto, ClientReadDto, ServiceReadDto } from "@/lib/types/dtos"
+import type { AppointmentReadDto, AppointmentCreateDto, ClientReadDto, ServiceReadDto } from "@/lib/types/dtos"
 import { useToast } from "@/hooks/use-toast"
 import { Search, CalendarIcon, Plus, Pencil } from "lucide-react"
 import { AppointmentDialog } from "@/components/dialogs/appointment-dialog"
@@ -103,7 +103,7 @@ export default function UserAppointmentsPage() {
   const handleUpdate = async (data: any) => {
     if (!editingAppointment) return
     try {
-      await appointmentsApi.update(editingAppointment.Id, data)
+      await appointmentsApi.update(Number(editingAppointment.Id), data)
       toast({
         title: "Success",
         description: "Appointment updated successfully",
@@ -249,8 +249,8 @@ export default function UserAppointmentsPage() {
       <AppointmentDialog
         open={dialogOpen}
         onOpenChange={setDialogOpen}
-        appointment={editingAppointment}
-        onSubmit={editingAppointment ? handleUpdate : handleCreate}
+        appointment={editingAppointment ?? null}
+        onSubmit={(data) => editingAppointment ? handleUpdate(data) : handleCreate(data as AppointmentCreateDto)}
         clients={clients}
         services={services}
       />

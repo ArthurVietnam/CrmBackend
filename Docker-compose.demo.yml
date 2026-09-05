@@ -1,0 +1,16 @@
+services:
+  crm-backend:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - JwtSettings__Secret=${JWT_SECRET:?JWT_SECRET is not set in .env}
+      - ConnectionStrings__DefaultConnection=Host=crm-db;Port=5432;Database=${POSTGRES_DB:?POSTGRES_DB is not set};Username=${POSTGRES_USER:?POSTGRES_USER is not set};Password=${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is not set}
+
+  postgres:
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:?POSTGRES_USER is not set}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is not set}
+      POSTGRES_DB: ${POSTGRES_DB:?POSTGRES_DB is not set}
+
+  crm-frontend:
+    environment:
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:?NEXT_PUBLIC_API_URL is not set}

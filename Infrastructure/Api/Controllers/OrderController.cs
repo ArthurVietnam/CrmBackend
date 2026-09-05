@@ -42,6 +42,7 @@ public class OrderController : ControllerBase
         }
     }
 
+    [AuthorizeByUser]
     [HttpGet("Get/{id}")]
     public async Task<IActionResult> GetById([FromRoute]Guid id)
     {
@@ -68,6 +69,7 @@ public class OrderController : ControllerBase
         }
     }
 
+    [AuthorizeByUser]
     [HttpPost("Create")]
     public async Task<IActionResult> Create([FromBody] OrderCreateDto request)
     {
@@ -86,6 +88,7 @@ public class OrderController : ControllerBase
         }
     }
 
+    [AuthorizeByUser]
     [HttpPut("Update/{id}")]
     public async Task<IActionResult> Update([FromBody] OrderUpdateDto request,[FromRoute] Guid id)
     {
@@ -105,6 +108,7 @@ public class OrderController : ControllerBase
         }
     }
     
+    [AuthorizeByUser]
     [HttpDelete("Delete/{id}")]
     public async Task<IActionResult> Delete([FromRoute]Guid id)
     {
@@ -123,6 +127,7 @@ public class OrderController : ControllerBase
         }
     }
     
+    [AuthorizeByUser]
     [HttpPost("AddService")]
     public async Task<IActionResult> AddService([FromBody] OrderServiceCreateDto request)
     {
@@ -140,6 +145,7 @@ public class OrderController : ControllerBase
         }
     }
     
+    [AuthorizeByUser]
     [HttpPut("UpdateStatus/{id}")]
     public async Task<IActionResult> UpdateStatus([FromRoute]Guid id,[FromQuery] StatusOfWork status)
     {
@@ -185,6 +191,7 @@ public class OrderController : ControllerBase
         }
     }
 
+    [AuthorizeNoSub]
     [HttpGet("GetByClient/{clientId}")]
     public async Task<IActionResult> GetByClient([FromRoute]Guid clientId)
     {
@@ -200,6 +207,7 @@ public class OrderController : ControllerBase
         }
     }
 
+    [AuthorizeNoSub]
     [HttpGet("GetByStatus")]
     public async Task<IActionResult> GetByStatus([FromQuery] StatusOfWork status, [FromQuery] Guid companyId)
     {
@@ -215,6 +223,7 @@ public class OrderController : ControllerBase
         }
     }
 
+    [AuthorizeNoSub]
     [HttpGet("GetByDateRange")]
     public async Task<IActionResult> GetByDateRange([FromQuery] DateTime start, [FromQuery] DateTime end)
     {

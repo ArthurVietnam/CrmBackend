@@ -40,7 +40,7 @@ public class OrderServiceController : ControllerBase
         }
     }
 
-    [AuthorizeByUser]
+    [AuthorizeNoSub]
     [HttpGet("Get/{id}")]
     public async Task<IActionResult> GetById([FromRoute]Guid id)
     {
@@ -126,7 +126,7 @@ public class OrderServiceController : ControllerBase
         }
     }
 
-    [AuthorizeByUser]
+    [AuthorizeNoSub]
     [HttpGet("GetByOrder/{orderId}")]
     public async Task<IActionResult> GetByOrder([FromRoute]Guid orderId)
     {
@@ -150,8 +150,8 @@ public class OrderServiceController : ControllerBase
             return StatusCode(500, ex.Message);
         }
     }
-
-    [AuthorizeByUser]
+    
+    [AuthorizeNoSub]
     [HttpGet("GetByService/{serviceId}")]
     public async Task<IActionResult> GetByService([FromRoute]Guid serviceId)
     {
@@ -176,7 +176,7 @@ public class OrderServiceController : ControllerBase
         }
     }
 
-    [AuthorizeByUser]
+    [AuthorizeNoSub]
     [HttpGet("CalculateTotal/{orderId}")]
     public async Task<IActionResult> CalculateOrderTotal([FromRoute]Guid orderId)
     {
@@ -192,7 +192,7 @@ public class OrderServiceController : ControllerBase
         }
     }
 
-    [AuthorizeByUser]
+    [AuthorizeNoSub]
     [HttpGet("CalculateRevenue/{serviceId}")]
     public async Task<IActionResult> CalculateTotalRevenue([FromRoute]Guid serviceId)
     {
