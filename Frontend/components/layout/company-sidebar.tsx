@@ -35,8 +35,10 @@ export function CompanySidebar() {
   return (
     <div className="flex h-screen w-64 flex-col border-r border-border bg-card">
       <div className="flex h-16 items-center border-b border-border px-6">
-        <Building2 className="h-6 w-6 text-primary" />
-        <span className="ml-2 text-lg font-semibold">CRM System</span>
+        <Link href="/" className="flex items-center" aria-label="CRM System home">
+          <Building2 className="h-6 w-6 text-primary" />
+          <span className="ml-2 text-lg font-semibold">CRM System</span>
+        </Link>
       </div>
 
       <nav className="flex-1 space-y-1 px-3 py-4">

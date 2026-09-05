@@ -44,7 +44,6 @@ export interface CompanyReadDto {
   Location: string
   Password: string
   Email: string
-  IsActive: boolean
   Subscribe: Subscribes
   SubscriptionEnd: string
 }
@@ -60,7 +59,6 @@ export interface CompanyUpdateDto {
   Name?: string
   Location?: string
   Email?: string
-  IsActive?: boolean
 }
 
 // Client DTOs

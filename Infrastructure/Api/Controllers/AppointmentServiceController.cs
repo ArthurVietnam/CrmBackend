@@ -41,7 +41,7 @@ public class AppointmentServiceController : ControllerBase
         }
     }
 
-    [AuthorizeByUser]
+    [AuthorizeNoSub]
     [HttpGet("Get/{id}")]
     public async Task<IActionResult> GetById([FromRoute] Guid id)
     {
@@ -121,7 +121,7 @@ public class AppointmentServiceController : ControllerBase
         }
     }
 
-    [AuthorizeByUser]
+    [AuthorizeNoSub]
     [HttpGet("GetByAppointment/{appointmentId}")]
     public async Task<IActionResult> GetByAppointment([FromRoute] Guid appointmentId)
     {
@@ -142,7 +142,7 @@ public class AppointmentServiceController : ControllerBase
         }
     }
 
-    [AuthorizeByUser]
+    [AuthorizeNoSub]
     [HttpGet("GetByService/{serviceId}")]
     public async Task<IActionResult> GetByService([FromRoute] Guid serviceId)
     {
@@ -163,7 +163,7 @@ public class AppointmentServiceController : ControllerBase
         }
     }
 
-    [AuthorizeByUser]
+    [AuthorizeNoSub]
     [HttpGet("CalculateTotal/{appointmentId}")]
     public async Task<IActionResult> CalculateTotal([FromRoute] Guid appointmentId)
     {
@@ -179,7 +179,7 @@ public class AppointmentServiceController : ControllerBase
         }
     }
 
-    [AuthorizeByUser]
+    [AuthorizeNoSub]
     [HttpGet("CalculateRevenue/{serviceId}")]
     public async Task<IActionResult> CalculateRevenue([FromRoute] Guid serviceId)
     {

@@ -29,7 +29,7 @@ public class JwtService
             new Claim(ClaimTypes.Email, email),
             new Claim(ClaimTypes.Role, role),
             new Claim("companyId",companyId.ToString()),
-            new Claim(ClaimTypes.Expiration, expireDate.ToString("yyyy-MM-dd"))
+            new Claim("expired", expireDate.ToString("yyyy-MM-dd"))
         };
         
         var key = _config["JwtSettings:Secret"];

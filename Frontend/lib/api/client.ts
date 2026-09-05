@@ -8,8 +8,7 @@ interface ApiError {
 class ApiClient {
   private accessToken: string | null = null
   private refreshToken: string | null = null
-  private isRefreshing = false
-  private refreshSubscribers: ((token: string) => void)[] = []
+  private refreshPromise: Promise<string> | null = null
 
   constructor() {
     if (typeof window !== "undefined") {
@@ -18,46 +17,52 @@ class ApiClient {
     }
   }
 
-  private subscribeTokenRefresh(callback: (token: string) => void) {
-    this.refreshSubscribers.push(callback)
-  }
-
-  private onTokenRefreshed(token: string) {
-    this.refreshSubscribers.forEach((callback) => callback(token))
-    this.refreshSubscribers = []
-  }
-
   private async refreshAccessToken(): Promise<string> {
-    if (!this.refreshToken) {
-      throw new Error("No refresh token available")
-    }
+    if (this.refreshPromise) return this.refreshPromise
+    if (!this.refreshToken) throw new Error("No refresh token available")
 
-    const authType = localStorage.getItem("authType") || "company"
+    const refreshToken = this.refreshToken
+    const authType = typeof window !== "undefined" ? localStorage.getItem("authType") : "company"
     const refreshEndpoint = authType === "company" ? "/api/Auth/CompanyRefresh" : "/api/Auth/UserRefresh"
 
-    const response = await fetch(`${API_BASE_URL}${refreshEndpoint}`, {
+    const refreshUrl = `${API_BASE_URL}${refreshEndpoint}?Token=${encodeURIComponent(refreshToken)}`
+
+    this.refreshPromise = fetch(refreshUrl, {
       method: "GET",
-      headers: {
-        Authorization: `Bearer ${this.refreshToken}`,
-      },
     })
+      .then(async (response) => {
+        if (!response.ok) {
+          this.logout()
+          throw new Error("Failed to refresh token")
+        }
 
-    if (!response.ok) {
-      this.logout()
-      throw new Error("Failed to refresh token")
-    }
+        const data = (await response.json()) as { AccessToken?: string }
+        if (!data.AccessToken) {
+          this.logout()
+          throw new Error("Refresh response did not contain an access token")
+        }
 
-    const data = await response.json()
-    this.setTokens(data.AccessToken, data.RefreshToken)
-    return data.AccessToken
+        // The backend returns only a new access token. The refresh token remains valid.
+        this.setTokens(data.AccessToken, undefined, authType || "company")
+        return data.AccessToken
+      })
+      .finally(() => {
+        this.refreshPromise = null
+      })
+
+    return this.refreshPromise
   }
 
-  setTokens(accessToken: string, refreshToken: string, authType?: string) {
+  setTokens(accessToken: string, refreshToken?: string, authType?: string) {
     this.accessToken = accessToken
-    this.refreshToken = refreshToken
+    if (refreshToken) {
+      this.refreshToken = refreshToken
+    }
     if (typeof window !== "undefined") {
       localStorage.setItem("accessToken", accessToken)
-      localStorage.setItem("refreshToken", refreshToken)
+      if (refreshToken) {
+        localStorage.setItem("refreshToken", refreshToken)
+      }
       if (authType) {
         localStorage.setItem("authType", authType)
       }
@@ -78,9 +83,13 @@ class ApiClient {
 
   async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const url = `${API_BASE_URL}${endpoint}`
-    const headers: HeadersInit = {
+    const headers: Record<string, string> = {
       "Content-Type": "application/json",
-      ...options.headers,
+      ...(options.headers instanceof Headers
+        ? Object.fromEntries(options.headers.entries())
+        : Array.isArray(options.headers)
+          ? Object.fromEntries(options.headers)
+          : options.headers ?? {}),
     }
 
     if (this.accessToken) {
@@ -93,29 +102,15 @@ class ApiClient {
     })
 
     if (response.status === 401 && this.refreshToken) {
-      if (!this.isRefreshing) {
-        this.isRefreshing = true
-        try {
-          const newToken = await this.refreshAccessToken()
-          this.isRefreshing = false
-          this.onTokenRefreshed(newToken)
-        } catch (error) {
-          this.isRefreshing = false
-          throw error
-        }
-      } else {
-        await new Promise<string>((resolve) => {
-          this.subscribeTokenRefresh((token) => {
-            resolve(token)
-          })
-        })
+      const newToken = await this.refreshAccessToken()
+      const retryHeaders: HeadersInit = {
+        ...headers,
+        Authorization: `Bearer ${newToken}`,
       }
 
-      // Retry request with new token
-      headers["Authorization"] = `Bearer ${this.accessToken}`
       response = await fetch(url, {
         ...options,
-        headers,
+        headers: retryHeaders,
       })
     }
 
@@ -147,9 +142,6 @@ class ApiClient {
   }
 
   async put<T>(endpoint: string, data?: unknown): Promise<T> {
-    console.log("[v0] PUT request to:", endpoint)
-    console.log("[v0] PUT data:", data)
-    console.log("[v0] PUT data stringified:", JSON.stringify(data))
     return this.request<T>(endpoint, {
       method: "PUT",
       body: data ? JSON.stringify(data) : undefined,

@@ -1,36 +1,50 @@
 ﻿using System.Net;
 using System.Net.Mail;
+using Microsoft.Extensions.Options;
 
 namespace Aplication.Services;
 
-public static class EmailService
+public class EmailSettings
 {
-    private const string SmtpServer = "smtp.your-email-provider.com"; // SMTP-сервер (например, smtp.gmail.com)
-    private const int SmtpPort = 587; // 587 (TLS) или 465 (SSL)
-    private const string SenderEmail = "your-email@example.com"; // Почта, с которой отправляем
-    private const string SenderPassword = "your-email-password"; // Пароль (или App Password, если это Gmail)
-    
-    public static async Task<string> SendVerificationCodeAsync(string recipientEmail,string token)
+    public string SmtpServer { get; set; } = string.Empty;
+    public int SmtpPort { get; set; }
+    public string SenderEmail { get; set; } = string.Empty;
+    public string SenderPassword { get; set; } = string.Empty;
+    public bool EnableSsl { get; set; } = true;
+}
+
+public interface IEmailService
+{
+    Task SendVerificationCodeAsync(string recipientEmail, string code);
+    string GenerateToken();
+}
+
+public class EmailService : IEmailService
+{
+    private readonly EmailSettings _settings;
+
+    public EmailService(IOptions<EmailSettings> settings)
     {
-        string subject = "Your access code";
-        string body = $"Your access code: {token}\n\nPrint it in app for finish verification.";
-
-        using (var client = new SmtpClient(SmtpServer, SmtpPort))
-        {
-            client.Credentials = new NetworkCredential(SenderEmail, SenderPassword);
-            client.EnableSsl = true; // Используем SSL
-
-            var message = new MailMessage(SenderEmail, recipientEmail, subject, body);
-            await client.SendMailAsync(message);
-        }
-
-        Console.WriteLine($"Code {token} send to {recipientEmail}");
-        return token;
+        _settings = settings.Value;
     }
 
-    public static string GenerateToken()
+    public async Task SendVerificationCodeAsync(string recipientEmail, string code)
     {
-        Random rnd = new Random();
-        return rnd.Next(100000, 999999).ToString();
+        var subject = "Your access code";
+        var body = $"Your access code: {code}\n\nPrint it in app for finish verification.";
+
+        using var client = new SmtpClient(_settings.SmtpServer, _settings.SmtpPort)
+        {
+            Credentials = new NetworkCredential(_settings.SenderEmail, _settings.SenderPassword),
+            EnableSsl = _settings.EnableSsl
+        };
+
+        var message = new MailMessage(_settings.SenderEmail, recipientEmail, subject, body);
+        await client.SendMailAsync(message);
+    }
+
+    public string GenerateToken()
+    {
+        return System.Security.Cryptography.RandomNumberGenerator.GetInt32(100000, 999999).ToString();
     }
 }

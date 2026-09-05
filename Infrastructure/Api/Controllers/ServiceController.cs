@@ -43,7 +43,7 @@ public class ServiceController : ControllerBase
         }
     }
 
-    [AuthorizeByUser]
+    [AuthorizeNoSub]
     [HttpGet("Get/{id}")]
     public async Task<IActionResult> GetById([FromRoute]Guid id)
     {
@@ -103,7 +103,7 @@ public class ServiceController : ControllerBase
         }
     }
 
-    [AuthorizeByUser]
+    [AuthorizeNoSub]
     [HttpGet("Popular")]
     public async Task<IActionResult> GetPopular([FromQuery] int count = 5)
     {
@@ -127,7 +127,7 @@ public class ServiceController : ControllerBase
         }
     }
 
-    [AuthorizeByUser]
+    [AuthorizeNoSub]
     [HttpGet("Search")]
     public async Task<IActionResult> Search([FromQuery] string term)
     {
@@ -151,7 +151,7 @@ public class ServiceController : ControllerBase
         }
     }
 
-    [AuthorizeByUser]
+    [AuthorizeNoSub]
     [HttpGet("GetByCompany")]
     public async Task<IActionResult> GetByCompany()
     {
@@ -175,7 +175,7 @@ public class ServiceController : ControllerBase
         }
     }
 
-    [AuthorizeByUser]
+    [AuthorizeNoSub]
     [HttpGet("GetByDateRange")]
     public async Task<IActionResult> GetByDateRange([FromQuery] DateTime start, [FromQuery] DateTime end)
     {

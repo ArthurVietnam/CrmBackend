@@ -43,7 +43,7 @@ public class AppointmentController : ControllerBase
         }
     }
 
-    [AuthorizeByUser]
+    [AuthorizeNoSub]
     [HttpGet("Get/{id}")]
     public async Task<IActionResult> GetById([FromRoute] Guid id)
     {
@@ -160,7 +160,7 @@ public class AppointmentController : ControllerBase
         }
     }
 
-    [AuthorizeByUser]
+    [AuthorizeNoSub]
     [HttpGet("ByDate")]
     public async Task<IActionResult> GetByDate([FromQuery] DateTime date)
     {
@@ -183,7 +183,7 @@ public class AppointmentController : ControllerBase
         }
     }
 
-    [AuthorizeByUser]
+    [AuthorizeNoSub]
     [HttpGet("ByStatus")]
     public async Task<IActionResult> GetByStatus([FromQuery] StatusOfWork status)
     {
@@ -206,7 +206,7 @@ public class AppointmentController : ControllerBase
         }
     }
 
-    [AuthorizeByUser]
+    [AuthorizeNoSub]
     [HttpGet("ByClient/{clientId}")]
     public async Task<IActionResult> GetByClient([FromRoute] Guid clientId)
     {
@@ -222,7 +222,7 @@ public class AppointmentController : ControllerBase
         }
     }
 
-    [AuthorizeByUser]
+    [AuthorizeNoSub]
     [HttpGet("GetByCompany")]
     public async Task<IActionResult> GetByCompany()
     {

@@ -9,7 +9,7 @@ namespace CrmPridnestrovye.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[AuthorizeByUser]
+
 public class ReportsController : ControllerBase
 {
     private readonly IReportService _reportService;
@@ -19,6 +19,7 @@ public class ReportsController : ControllerBase
         _reportService = reportService;
     }
 
+    [AuthorizeNoSub]
     [HttpGet("monthly")]
     public async Task<IActionResult> GetMonthlyReport(int month, int year)
     {

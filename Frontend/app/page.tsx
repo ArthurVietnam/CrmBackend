@@ -1,163 +1,92 @@
 "use client"
 
-import type React from "react"
-import { useState } from "react"
-import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { useAuth } from "@/lib/context/auth-context"
+import { ArrowRight, BarChart3, Building2, CalendarCheck2, CheckCircle2, ShieldCheck, Users2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Building2, User, Loader2 } from "lucide-react"
-import { useToast } from "@/hooks/use-toast"
+import { useAuth } from "@/lib/context/auth-context"
+
+const highlights = [
+  { icon: Users2, title: "One customer view", text: "Keep clients, teams, and activity connected in one workspace." },
+  { icon: CalendarCheck2, title: "Work stays on track", text: "Coordinate appointments, orders, and services without losing context." },
+  { icon: BarChart3, title: "Decisions from data", text: "Turn operational activity into clear reports for your business." },
+]
 
 export default function HomePage() {
-  const router = useRouter()
-  const { login, isAuthenticated, userType } = useAuth()
-  const { toast } = useToast()
-  const [isLoading, setIsLoading] = useState(false)
-
-  // Redirect if already authenticated
-  if (isAuthenticated) {
-    if (userType === "company") {
-      router.push("/company/dashboard")
-    } else if (userType === "user") {
-      router.push("/user")
-    }
-    return null
-  }
-
-  const handleLogin = async (e: React.FormEvent<HTMLFormElement>, type: "company" | "user") => {
-    e.preventDefault()
-    setIsLoading(true)
-
-    const formData = new FormData(e.currentTarget)
-    const email = formData.get("email") as string
-    const password = formData.get("password") as string
-
-    try {
-      await login(email, password, type)
-      toast({
-        title: "Success",
-        description: "Logged in successfully",
-      })
-      router.push(type === "company" ? "/company/dashboard" : "/user")
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to login",
-        variant: "destructive",
-      })
-    } finally {
-      setIsLoading(false)
-    }
-  }
+  const { isAuthenticated, userType, isLoading } = useAuth()
+  const dashboardHref = userType === "company" ? "/company/dashboard" : "/user"
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <div className="w-full max-w-4xl">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-balance mb-2">CRM System</h1>
-          <p className="text-muted-foreground text-pretty">Professional client relationship management platform</p>
+    <main className="min-h-screen overflow-hidden bg-background">
+      <header className="border-b border-border/70">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 lg:px-8">
+          <Link href="/" className="flex items-center gap-3" aria-label="CRM System home">
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-lg shadow-primary/20">
+              <Building2 className="h-5 w-5" />
+            </span>
+            <span className="text-lg font-semibold tracking-tight">CRM System</span>
+          </Link>
+          {!isLoading && (
+            <div className="flex items-center gap-3">
+              {isAuthenticated ? (
+                <Button asChild>
+                  <Link href={dashboardHref}>Open dashboard <ArrowRight className="ml-2 h-4 w-4" /></Link>
+                </Button>
+              ) : (
+                <>
+                  <Button variant="ghost" asChild><Link href="/login">Log in</Link></Button>
+                  <Button asChild><Link href="/register/company">Sign up <ArrowRight className="ml-2 h-4 w-4" /></Link></Button>
+                </>
+              )}
+            </div>
+          )}
+        </div>
+      </header>
+
+      <section className="mx-auto grid max-w-7xl gap-14 px-6 pb-20 pt-16 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:px-8 lg:pb-28 lg:pt-24">
+        <div>
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-primary/25 bg-primary/10 px-3 py-1.5 text-sm text-primary">
+            <ShieldCheck className="h-4 w-4" /> Built for focused teams
+          </div>
+          <h1 className="max-w-3xl text-balance text-5xl font-semibold tracking-[-0.04em] text-foreground sm:text-6xl lg:text-7xl">
+            Run the work behind every great customer relationship.
+          </h1>
+          <p className="mt-6 max-w-xl text-pretty text-lg leading-8 text-muted-foreground">
+            CRM System gives companies one calm place to manage clients, services, orders, appointments, and reports.
+          </p>
+          <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+            {isAuthenticated ? (
+              <Button size="lg" asChild><Link href={dashboardHref}>Go to your dashboard <ArrowRight className="ml-2 h-4 w-4" /></Link></Button>
+            ) : (
+              <>
+                <Button size="lg" asChild><Link href="/register/company">Create a company account <ArrowRight className="ml-2 h-4 w-4" /></Link></Button>
+                <Button size="lg" variant="outline" asChild><Link href="/login">Log in</Link></Button>
+              </>
+            )}
+          </div>
+          <p className="mt-5 text-sm text-muted-foreground">Manage the details. Keep the momentum.</p>
         </div>
 
-        <Tabs defaultValue="company" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-8">
-            <TabsTrigger value="company" className="gap-2">
-              <Building2 className="h-4 w-4" />
-              Company Login
-            </TabsTrigger>
-            <TabsTrigger value="user" className="gap-2">
-              <User className="h-4 w-4" />
-              User Login
-            </TabsTrigger>
-          </TabsList>
+        <div className="relative rounded-3xl border border-border bg-card p-4 shadow-2xl shadow-primary/10">
+          <div className="rounded-2xl border border-border/80 bg-background p-5">
+            <div className="flex items-center justify-between border-b border-border pb-5">
+              <div><p className="text-sm text-muted-foreground">Workspace overview</p><p className="mt-1 text-xl font-semibold">Good morning, team</p></div>
+              <span className="rounded-lg bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary">Live workspace</span>
+            </div>
+            <div className="grid gap-3 py-5 sm:grid-cols-3">
+              {["Clients", "Open orders", "Appointments"].map((label, index) => (
+                <div key={label} className="rounded-xl border border-border bg-card p-4"><p className="text-xs text-muted-foreground">{label}</p><p className="mt-3 text-2xl font-semibold">{["248", "36", "19"][index]}</p><p className="mt-1 text-xs text-primary">+{["12", "8", "4"][index]} this month</p></div>
+              ))}
+            </div>
+            <div className="rounded-xl border border-border bg-card p-4"><div className="flex items-center justify-between"><p className="font-medium">Recent activity</p><span className="text-xs text-muted-foreground">Today</span></div><div className="mt-4 space-y-3">{["New client profile created", "Order moved to in progress", "Appointment confirmed"].map((item) => <div key={item} className="flex items-center gap-3 text-sm"><CheckCircle2 className="h-4 w-4 text-primary" /><span className="text-muted-foreground">{item}</span></div>)}</div></div>
+          </div>
+        </div>
+      </section>
 
-          <TabsContent value="company">
-            <Card className="max-w-md mx-auto">
-              <CardHeader>
-                <CardTitle>Company Login</CardTitle>
-                <CardDescription>Access your company dashboard</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={(e) => handleLogin(e, "company")} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="company-email">Email</Label>
-                    <Input
-                      id="company-email"
-                      name="email"
-                      type="email"
-                      placeholder="company@example.com"
-                      required
-                      disabled={isLoading}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="company-password">Password</Label>
-                    <Input id="company-password" name="password" type="password" required disabled={isLoading} />
-                  </div>
-                  <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Logging in...
-                      </>
-                    ) : (
-                      "Login"
-                    )}
-                  </Button>
-                  <div className="text-center pt-2">
-                    <p className="text-sm text-muted-foreground mb-2">Don't have an account?</p>
-                    <Button variant="outline" className="w-full bg-transparent" asChild>
-                      <Link href="/register/company">Register Company</Link>
-                    </Button>
-                  </div>
-                </form>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="user">
-            <Card className="max-w-md mx-auto">
-              <CardHeader>
-                <CardTitle>User Login</CardTitle>
-                <CardDescription>Access your personal dashboard</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={(e) => handleLogin(e, "user")} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="user-email">Email</Label>
-                    <Input
-                      id="user-email"
-                      name="email"
-                      type="email"
-                      placeholder="user@example.com"
-                      required
-                      disabled={isLoading}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="user-password">Password</Label>
-                    <Input id="user-password" name="password" type="password" required disabled={isLoading} />
-                  </div>
-                  <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Logging in...
-                      </>
-                    ) : (
-                      "Login"
-                    )}
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-      </div>
-    </div>
+      <section className="border-y border-border bg-card/50">
+        <div className="mx-auto grid max-w-7xl gap-4 px-6 py-8 sm:grid-cols-3 lg:px-8">
+          {highlights.map(({ icon: Icon, title, text }) => <div key={title} className="flex gap-4 p-3"><Icon className="mt-1 h-5 w-5 shrink-0 text-primary" /><div><h2 className="font-semibold">{title}</h2><p className="mt-1 text-sm leading-6 text-muted-foreground">{text}</p></div></div>)}
+        </div>
+      </section>
+    </main>
   )
 }

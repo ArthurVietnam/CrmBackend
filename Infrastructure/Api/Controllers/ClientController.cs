@@ -41,7 +41,7 @@ public class ClientController : ControllerBase
         }
     }
 
-    [AuthorizeByUser]
+    [AuthorizeNoSub]
     [HttpGet("Get/{id}")]
     public async Task<IActionResult> GetById([FromRoute] Guid id)
     {
@@ -126,7 +126,7 @@ public class ClientController : ControllerBase
         }
     }
 
-    [AuthorizeByUser]
+    [AuthorizeNoSub]
     [HttpGet("Search")]
     public async Task<ActionResult<IReadOnlyList<ClientReadDto>>> Search([FromQuery] string searchTerm)
     {
@@ -145,7 +145,7 @@ public class ClientController : ControllerBase
         }
     }
 
-    [AuthorizeByUser]
+    [AuthorizeNoSub]
     [HttpGet("GetByCompany")]
     public async Task<IActionResult> GetByCompany()
     {
