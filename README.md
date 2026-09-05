@@ -1,6 +1,6 @@
-# CRM Backend
+# CRM
 
-Backend for a CRM system built with **.NET 8**, using **Layered Architecture** and applying **DDD** and **SOLID** principles.
+A CRM system built with **.NET 8** on the backend and **Next.js** on the client side, following **Layered Architecture** and applying **DDD** and **SOLID** principles.
 
 The system provides functionality for managing clients, orders, services, appointments, and companies. It also implements JWT-based authentication and multi-company data isolation.
 
@@ -22,7 +22,7 @@ The system provides functionality for managing clients, orders, services, appoin
 
 ## Architecture
 
-The project follows a layered architecture with responsibilities separated across several layers.
+The backend follows a layered architecture with responsibilities separated across several layers.
 
 ### Domain
 
@@ -36,7 +36,7 @@ Main entities include:
 * `Appointment`
 * `Company`
 
-The domain layer contains business rules, validation, and methods responsible for changing entity state, such as:
+The domain layer holds business rules, validation, and methods responsible for changing entity state, such as:
 
 * `Update`
 * `Cancel`
@@ -72,7 +72,7 @@ Includes:
 
 ### Shared
 
-Contains components shared between different layers, including:
+Contains components used across different layers, including:
 
 * DTOs.
 * Enumerations.
@@ -95,7 +95,7 @@ Two authentication contexts are supported:
 * User authentication.
 * Company authentication.
 
-The application provides dedicated authorization attributes for validating the corresponding authentication context.
+The application provides dedicated authorization attributes for validating the corresponding context.
 
 ## Subscription Management
 
@@ -107,19 +107,30 @@ A background service periodically checks subscription expiration dates and autom
 
 PostgreSQL is used as the primary database.
 
-Entity Framework Core is configured using the Code First approach. Database entities and relationships are represented through the domain and infrastructure layers.
+Entity Framework Core is configured using the Code First approach, with migrations applied automatically on startup. Database entities and relationships are represented through the domain and infrastructure layers.
 
 ## Validation
 
-Validation is implemented at multiple levels.
+Validation happens at multiple levels.
 
-`FluentValidation` is used for validating application input, while domain rules and invariants are used to protect the consistency of domain entities.
+`FluentValidation` covers application input, while domain rules and invariants protect the consistency of domain entities.
 
 ## Caching
 
-Caching is used to reduce unnecessary database queries and improve response times for frequently requested data.
+Caching reduces unnecessary database queries and improves response times for frequently requested data.
 
 The project uses `DistributedCache` for cache management.
+
+## Deployment
+
+The project is containerized with Docker and runs on a self-hosted Ubuntu Server virtual machine.
+
+* A base `docker-compose.yml` defines the services (API, PostgreSQL, Redis, client) with sensible defaults for local development.
+* A `docker-compose.demo.yml` override enforces required secrets and configuration for the hosted environment, sourced from a `.env` file kept only on the server.
+* Public access is provided through a **Cloudflare Tunnel**, which routes a custom domain to the containers without exposing any inbound ports on the host.
+* Continuous deployment runs through **GitHub Actions**: on every push to `main`, the workflow temporarily joins the private network via **Tailscale**, connects to the server over SSH with a dedicated deploy key, pulls the latest code, and rebuilds the containers.
+
+This setup keeps secrets off the repository, requires no open ports for remote management, and allows deployment without manual intervention on the server.
 
 ## Technologies
 
@@ -134,6 +145,10 @@ The project uses `DistributedCache` for cache management.
 * DistributedCache
 * Swagger / OpenAPI
 * ILogger
+* Docker / Docker Compose
+* GitHub Actions
+* Cloudflare Tunnel
+* Tailscale
 
 ## Project Structure
 
@@ -142,9 +157,10 @@ Domain/
 Application/
 Infrastructure/
 Shared/
+Frontend/
 ```
 
-The separation of layers is intended to keep business logic independent from infrastructure concerns and improve maintainability and testability.
+The separation of layers keeps business logic independent from infrastructure concerns and improves maintainability and testability.
 
 ## Author
 
