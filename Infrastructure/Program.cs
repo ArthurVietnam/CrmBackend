@@ -88,7 +88,8 @@ builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<VerificationService>(); 
 builder.Services.AddScoped<JwtService>();
 builder.Services.AddScoped<IReportService, ReportService>();
-
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 builder.Services.AddDataProtection()
     .PersistKeysToFileSystem(new DirectoryInfo("/app/keys"))
