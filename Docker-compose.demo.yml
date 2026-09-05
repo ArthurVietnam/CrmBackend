@@ -4,6 +4,10 @@ services:
       - ASPNETCORE_ENVIRONMENT=Production
       - JwtSettings__Secret=${JWT_SECRET:?JWT_SECRET is not set in .env}
       - ConnectionStrings__DefaultConnection=Host=crm-db;Port=5432;Database=${POSTGRES_DB:?POSTGRES_DB is not set};Username=${POSTGRES_USER:?POSTGRES_USER is not set};Password=${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is not set}
+      - EmailSettings__SmtpServer=${EMAIL_SMTP_SERVER:?EMAIL_SMTP_SERVER is not set}
+      - EmailSettings__SmtpPort=${EMAIL_SMTP_PORT:?EMAIL_SMTP_PORT is not set}
+      - EmailSettings__SenderEmail=${EMAIL_SENDER:?EMAIL_SENDER is not set}
+      - EmailSettings__SenderPassword=${EMAIL_PASSWORD:?EMAIL_PASSWORD is not set}
 
   postgres:
     environment:
