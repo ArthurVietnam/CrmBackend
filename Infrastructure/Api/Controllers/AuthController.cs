@@ -1,5 +1,6 @@
 ﻿using Aplication.Attributes.Authorization;
 using Aplication.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Dtos.CompanyDto;
@@ -66,6 +67,7 @@ public class AuthController : ControllerBase
         }
     }
     
+    [AuthorizeByCompany]
     [HttpPost("CompanyCreate")]
     public async Task<IActionResult> CompanyCreate([FromBody] CompanyCreateDto request)
     {
