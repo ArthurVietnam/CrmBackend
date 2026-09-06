@@ -5,6 +5,7 @@ using Aplication.Mapping;
 using Aplication.Services;
 using CrmPridnestrovye.Caching;
 using CrmPridnestrovye.Dal.EntityFrameworkCore;
+using CrmPridnestrovye.Dal.EntityFrameworkCore.Services;
 using CrmPridnestrovye.Dal.Repositories;
 using CrmPridnestrovye.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -27,6 +28,7 @@ builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IVerificationCodeRepository,VerificationCodeRepository>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+builder.Services.AddScoped<IDatabaseResetService, DatabaseResetService>();
 
 #endregion
 
@@ -73,10 +75,13 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.PropertyNamingPolicy = null; 
     });
 
+builder.Services.AddHostedService<DailyDatabaseResetService>();
+
 #endregion
 
 #region Services
 
+builder.Services.AddScoped<CompanySeedService>();
 builder.Services.AddScoped<AppointmentService>();
 builder.Services.AddScoped<AppointmentServiceService>();
 builder.Services.AddScoped<ClientService>();

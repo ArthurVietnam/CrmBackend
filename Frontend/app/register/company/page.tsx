@@ -58,13 +58,13 @@ export default function CompanyRegisterPage() {
           className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6"
         >
           <ArrowLeft className="h-4 w-4" />
-          Back to login
+          Back to CRM System
         </Link>
 
         <Card>
           <CardHeader>
             <CardTitle>Register Company</CardTitle>
-            <CardDescription>Create a new company account with 30-day free trial</CardDescription>
+            <CardDescription>Create your company account and start with a 7-day free trial of the Basic plan.</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleRegister} className="space-y-4">

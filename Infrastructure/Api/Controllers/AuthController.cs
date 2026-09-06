@@ -67,7 +67,6 @@ public class AuthController : ControllerBase
         }
     }
     
-    [AuthorizeByCompany]
     [HttpPost("CompanyCreate")]
     public async Task<IActionResult> CompanyCreate([FromBody] CompanyCreateDto request)
     {

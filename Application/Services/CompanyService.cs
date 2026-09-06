@@ -15,15 +15,24 @@ public class CompanyService
     private readonly ICompanyRepository _repository;
     private readonly IMapper _mapper;
     private readonly VerificationService _verificationService;
+    private readonly CompanySeedService _seedService;
     private readonly IClientRepository _clientRepository;
     private readonly IAppointmentRepository _appointmentRepository;
     private readonly IOrderRepository _orderRepository;
 
-    public CompanyService(ICompanyRepository repository, IMapper mapper,VerificationService verificationService, IClientRepository clientRepository, IAppointmentRepository appointmentRepository, IOrderRepository orderRepository)
+    public CompanyService(
+        ICompanyRepository repository,
+        IMapper mapper,
+        VerificationService verificationService,
+        CompanySeedService seedService,
+        IClientRepository clientRepository,
+        IAppointmentRepository appointmentRepository,
+        IOrderRepository orderRepository)
     {
         _repository = repository;
         _mapper = mapper;
         _verificationService = verificationService;
+        _seedService = seedService;
         _clientRepository = clientRepository;
         _appointmentRepository = appointmentRepository;
         _orderRepository = orderRepository;
@@ -32,8 +41,9 @@ public class CompanyService
     public async Task<CompanyReadDto> CreateAsync(CompanyCreateDto dto)
     {
         var entity = _mapper.Map<Company>(dto);
+        entity.ExtendSubscriptionByDays(1);
         await _repository.AddAsync(entity);
-        await _verificationService.ResendCodeAsync(entity.Id);
+        await _seedService.SeedForCompanyAsync(entity.Id);
         return _mapper.Map<CompanyReadDto>(entity);
     }
 
@@ -43,15 +53,15 @@ public class CompanyService
                      ?? throw new NotFoundException("Company not found");
         return _mapper.Map<CompanyReadDto>(entity);
     }
-    
+
     public async Task<StatisticsReadDto> GetStatistics(Guid companyId)
     {
         var company = await _repository.GetByIdAsync(companyId)
                      ?? throw new NotFoundException("Company not found");
-        
+
         var to = (await _orderRepository.GetByCompanyAsync(companyId) ??
                   new List<Order>()).Count();
-        
+
         var tr = (await _orderRepository.GetByCompanyAsync(companyId) ??
                   new List<Order>())
                  .Where(o => o.Status == StatusOfWork.Done)
@@ -60,17 +70,17 @@ public class CompanyService
                   new List<Appointment>())
                  .Where(a => a.Status == StatusOfWork.Done)
                  .Sum(a => a.Sum);
-        
+
         var tc = (await _clientRepository.GetByCompanyAsync(companyId) ??
                   new List<Client>()).Count();
-        
+
         var ta = (await _appointmentRepository.GetByCompanyAsync(companyId) ??
                   new List<Appointment>())
             .Where(a =>
                 a.Status == StatusOfWork.Sheduled ||
                 a.Status == StatusOfWork.InProgress)
             .Count();
-        
+
         var statistics = new StatisticsReadDto
         {
             TotalRevenue = tr,
@@ -80,7 +90,7 @@ public class CompanyService
         };
         return statistics;
     }
-        
+
     public async Task<CompanyReadDto> GetByEmailAsync(string email)
     {
         var entity = await _repository.GetByEmailAsync(email)
@@ -90,7 +100,6 @@ public class CompanyService
 
     public async Task<IReadOnlyList<Company>> GetAllAsync()
     {
-        
         return await _repository.GetAllAsync();
     }
 
@@ -106,17 +115,16 @@ public class CompanyService
         return _mapper.Map<IReadOnlyList<CompanyReadDto>>(entities);
     }
 
-    public async Task ExtendSubscriptionAsync(Guid companyId, int months,Subscribes subscribe = Subscribes.Basic)
+    public async Task ExtendSubscriptionAsync(Guid companyId, int months, Subscribes subscribe = Subscribes.Basic)
     {
         var company = await _repository.GetByIdAsync(companyId)
                       ?? throw new NotFoundException("Company not found");
 
-        company.ExtendSubscriptionByMonths(months,subscribe);
+        company.ExtendSubscriptionByMonths(months, subscribe);
         await _repository.UpdateAsync(company);
     }
-    
 
-    public async Task UpdateAsync(CompanyUpdateDto dto,Guid companyId)
+    public async Task UpdateAsync(CompanyUpdateDto dto, Guid companyId)
     {
         var company = await _repository.GetByIdAsync(companyId)
                       ?? throw new NotFoundException("Company not found");
@@ -132,11 +140,11 @@ public class CompanyService
         await _repository.DeleteAsync(company);
     }
 
-    public async Task<Company> LoginAsync(string email,string password)
+    public async Task<Company> LoginAsync(string email, string password)
     {
         var company = await _repository.GetByEmailAsync(email)
                       ?? throw new NotFoundException("Company not found");
-        
+
         if (company.Password == password)
         {
             return company;
