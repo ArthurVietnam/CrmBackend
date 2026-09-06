@@ -14,7 +14,7 @@ The system provides functionality for managing clients, orders, services, appoin
 * Order status management.
 * Appointment scheduling, updating, completion, and cancellation.
 * Email service for registration and token delivery.
-* Background service for automatic subscription deactivation.
+* Subscription-aware access control, checked on every request.
 * Domain-level validation using FluentValidation and domain invariants.
 * Application logging using `ILogger`.
 * Caching for frequently accessed data.
@@ -52,7 +52,6 @@ Responsibilities include:
 * DTOs and object mapping.
 * Email service integration.
 * Registration token delivery.
-* Background subscription management.
 * Authentication and authorization attributes.
 
 Custom attributes such as `[LoginByUser]` and `[LoginByCompany]` are used to validate access tokens and determine the authentication context.
@@ -99,9 +98,9 @@ The application provides dedicated authorization attributes for validating the c
 
 ## Subscription Management
 
-The system includes subscription management for companies.
+Subscription status is evaluated on every request rather than through a separate scheduled process.
 
-A background service periodically checks subscription expiration dates and automatically deactivates expired subscriptions.
+Once a company's subscription expires, write operations are blocked while read access to existing data remains available, so a company never loses visibility into its own records even without an active plan.
 
 ## Data Access
 
@@ -161,6 +160,10 @@ Frontend/
 ```
 
 The separation of layers keeps business logic independent from infrastructure concerns and improves maintainability and testability.
+
+## Demo
+
+A live demo is available at [muntyandev.ru](https://muntyandev.ru).
 
 ## Author
 
