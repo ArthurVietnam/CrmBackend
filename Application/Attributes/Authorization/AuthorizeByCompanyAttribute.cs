@@ -18,7 +18,7 @@ public class AuthorizeByCompanyAttribute : AuthorizeAttribute, IAsyncAuthorizati
 
         var isCompany = user.Claims.Any(c => 
             (c.Type == "role" || c.Type == ClaimTypes.Role) && c.Value == "Company");
-        var isActive = user.Claims.Any(c => (c.Type == "expired") && DateTime.Parse(c.Value) > DateTime.Now);
+        var isActive = user.Claims.Any(c => (c.Type == "expired") && DateTime.Parse(c.Value) > DateTime.UtcNow);
         
         if (!isCompany || !isActive)
         {

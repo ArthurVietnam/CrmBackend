@@ -6,6 +6,7 @@ import { useAuth } from "@/lib/context/auth-context"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
 import { CompanySidebar } from "@/components/layout/company-sidebar"
+import { DemoNotice } from "@/components/demo-notice"
 import { Toaster } from "@/components/ui/toaster"
 
 export default function CompanyLayout({ children }: { children: React.ReactNode }) {
@@ -32,6 +33,7 @@ export default function CompanyLayout({ children }: { children: React.ReactNode 
       <main className="flex-1 overflow-y-auto bg-background">
         <div className="container mx-auto p-6">{children}</div>
       </main>
+      <DemoNotice compact />
       <Toaster />
     </div>
   )

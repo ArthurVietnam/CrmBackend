@@ -17,8 +17,9 @@ public class AuthorizeNoSub: AuthorizeAttribute, IAsyncAuthorizationFilter
         }
         
         var isCompany = user.Claims.Any(c => (c.Type == "role" || c.Type == ClaimTypes.Role) && c.Value == "Company");
+        var isUser = user.Claims.Any(c => (c.Type == "role" || c.Type == ClaimTypes.Role) && c.Value == "User");
 
-        if (!isCompany)
+        if (!isCompany && !isUser)
         {
             context.Result = new Microsoft.AspNetCore.Mvc.UnauthorizedResult();
         }

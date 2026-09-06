@@ -8,6 +8,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { LogOut, User, ShoppingCart, Calendar, Home, Users, Wrench } from "lucide-react"
 import { useAuth } from "@/lib/context/auth-context"
+import { DemoNotice } from "@/components/demo-notice"
 
 export default function UserLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter()
@@ -35,6 +36,7 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <div className="min-h-screen bg-background">
+      <DemoNotice compact />
       <header className="border-b">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">

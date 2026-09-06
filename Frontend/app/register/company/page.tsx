@@ -11,11 +11,19 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Loader2, ArrowLeft } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { authApi } from "@/lib/api/auth"
+import { useAuth } from "@/lib/context/auth-context"
+import { DemoNotice } from "@/components/demo-notice"
 import type { CompanyCreateDto } from "@/lib/types/dtos"
 
 export default function CompanyRegisterPage() {
   const router = useRouter()
+  const { isAuthenticated, userType, isLoading: authLoading } = useAuth()
   const { toast } = useToast()
+
+  if (!authLoading && isAuthenticated) {
+    router.replace(userType === "company" ? "/company/dashboard" : "/user")
+    return null
+  }
   const [isLoading, setIsLoading] = useState(false)
 
   const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -38,7 +46,7 @@ export default function CompanyRegisterPage() {
         description: "Company registered successfully. Please log in to continue.",
       })
 
-      router.push("/")
+      router.push("/login?registered=1")
     } catch (error) {
       toast({
         title: "Error",
@@ -52,6 +60,7 @@ export default function CompanyRegisterPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
+      <DemoNotice compact />
       <div className="w-full max-w-md">
         <Link
           href="/"
@@ -64,7 +73,7 @@ export default function CompanyRegisterPage() {
         <Card>
           <CardHeader>
             <CardTitle>Register Company</CardTitle>
-            <CardDescription>Create your company account and start with a 7-day free trial of the Basic plan.</CardDescription>
+            <CardDescription>Create your company account and start with a 7-day free trial of the Basic plan.</CardDescription><div className="mt-4"><DemoNotice /></div>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleRegister} className="space-y-4">

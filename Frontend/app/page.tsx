@@ -4,6 +4,7 @@ import Link from "next/link"
 import { ArrowRight, BarChart3, Building2, CalendarCheck2, Check, ShieldCheck, Users2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/lib/context/auth-context"
+import { DemoNotice } from "@/components/demo-notice"
 
 const highlights = [
   { icon: Users2, title: "One customer view", text: "Keep clients, teams, and activity connected in one workspace." },
@@ -17,6 +18,7 @@ export default function HomePage() {
 
   return (
     <main className="min-h-screen overflow-hidden bg-background">
+      <DemoNotice compact />
       <header className="border-b border-border/70">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 lg:px-8">
           <Link href="/" className="flex items-center gap-3" aria-label="CRM System home">
@@ -83,7 +85,7 @@ export default function HomePage() {
             <div className="mt-8 grid gap-4 sm:grid-cols-2">
               {["7-day free trial at registration", "Up to 5 employee accounts", "5 users or devices for your team", "Unlimited clients, services, orders, appointments, and reports"].map((item) => <div key={item} className="flex gap-3 text-sm leading-6"><Check className="mt-1 h-4 w-4 shrink-0 text-primary" /><span>{item}</span></div>)}
             </div>
-            <Button className="mt-8 w-full" size="lg" asChild><Link href="/register/company">Start your 7-day trial <ArrowRight className="ml-2 h-4 w-4" /></Link></Button>
+            <Button className="mt-8 w-full" size="lg" asChild><Link href={isAuthenticated ? "/company/dashboard" : "/register/company"}>Start your 7-day trial <ArrowRight className="ml-2 h-4 w-4" /></Link></Button>
             <p className="mt-4 text-center text-xs leading-5 text-muted-foreground">One company account includes five worker accounts. Everything else is unlimited.</p>
           </div>
         </div>
